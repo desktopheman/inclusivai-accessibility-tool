@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureAI.WebAccessibilityTool.API", "Azure.AI.WebAccessibilityTool.API\AzureAI.WebAccessibilityTool.API.csproj", "{1F71D3E9-5851-40F3-AE21-8B2B6D76B609}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureAI.WebAccessibilityTool", "Azure.AI.WebAccessibilityTool\AzureAI.WebAccessibilityTool.csproj", "{05B98538-3E9A-463A-A404-DEB9EE93527F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureAI.WebAccessibilityTool.Tests", "Azure.AI.WebAccessibilityTool.Tests\AzureAI.WebAccessibilityTool.Tests.csproj", "{C026778D-9A95-4FD9-94C0-D0FE4D530C3D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3D20B449-6E1E-4D60-8F54-EABCB40ADB72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4B2BEE97-DF6F-4451-8F01-B7EA345F561E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F71D3E9-5851-40F3-AE21-8B2B6D76B609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F71D3E9-5851-40F3-AE21-8B2B6D76B609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F71D3E9-5851-40F3-AE21-8B2B6D76B609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F71D3E9-5851-40F3-AE21-8B2B6D76B609}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05B98538-3E9A-463A-A404-DEB9EE93527F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B98538-3E9A-463A-A404-DEB9EE93527F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B98538-3E9A-463A-A404-DEB9EE93527F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B98538-3E9A-463A-A404-DEB9EE93527F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C026778D-9A95-4FD9-94C0-D0FE4D530C3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C026778D-9A95-4FD9-94C0-D0FE4D530C3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C026778D-9A95-4FD9-94C0-D0FE4D530C3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C026778D-9A95-4FD9-94C0-D0FE4D530C3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1F71D3E9-5851-40F3-AE21-8B2B6D76B609} = {4B2BEE97-DF6F-4451-8F01-B7EA345F561E}
+		{05B98538-3E9A-463A-A404-DEB9EE93527F} = {4B2BEE97-DF6F-4451-8F01-B7EA345F561E}
+		{C026778D-9A95-4FD9-94C0-D0FE4D530C3D} = {3D20B449-6E1E-4D60-8F54-EABCB40ADB72}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9ADABDB-2EB2-474E-95DB-A2FAB24E123C}
+	EndGlobalSection
+EndGlobal

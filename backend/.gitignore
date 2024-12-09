@@ -1,0 +1,48 @@
+# Compiled binary files
+bin/
+obj/
+*.pdb
+*.mdb
+
+# User-specific files
+*.user
+*.suo
+*.csproj.user
+
+# Visual Studio and IDE settings
+.vs/
+.idea/
+*.sln.iml
+
+# Build files
+*.opendb
+*.VC.db
+TestResults/
+
+# Configuration files
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+appsettings.Staging.json
+secret.json
+local.settings.json
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# Publish outputs
+*.publish/
+.publish/
+
+# Logs and crash reports
+*.log
+crashlog/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Rider and JetBrains
+.idea/
