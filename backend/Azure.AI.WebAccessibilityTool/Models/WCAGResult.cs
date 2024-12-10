@@ -48,6 +48,16 @@ public class WCAGItem
     /// The severity of the issue that was found.
     /// </summary>
     public required string Severity { get; set; }
+
+    /// <summary>
+    /// The source of the issue analysis: WCAG 2.1 (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act)
+    /// </summary>
+    public required string Source { get; set; }
+
+    /// <summary>
+    /// The details of the issue that was found.
+    /// </summary>
+    public required string Details { get; set; }
 }
 
 
