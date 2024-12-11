@@ -12,6 +12,8 @@ using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using System;
+using MimeDetective;
+using System.Reflection;
 
 namespace AzureAI.WebAccessibilityTool.Services;
 
@@ -32,6 +34,10 @@ public class AccessibilityAnalyzer
     private readonly string azureOpenAIDeploymentName;
     private readonly string openAIAssistantId;
 
+    private readonly string storageAccountName;
+    private readonly string storageAccountKey;
+    private readonly string storageContainerName;
+
     /// <summary>
     /// Constructor to initialize API keys, endpoints, and SDK clients.
     /// </summary>
@@ -42,8 +48,13 @@ public class AccessibilityAnalyzer
         
         openAiEndpoint = configuration["AzureServices:OpenAI:Endpoint"] ?? throw new ArgumentNullException(nameof(openAiEndpoint));
         openAiApiKey = configuration["AzureServices:OpenAI:ApiKey"] ?? throw new ArgumentNullException(nameof(openAiApiKey));
+        
         azureOpenAIDeploymentName = configuration["AzureServices:OpenAI:DeploymentName"] ?? throw new ArgumentNullException(nameof(azureOpenAIDeploymentName));
         openAIAssistantId = configuration["AzureServices:OpenAI:AssistantId"] ?? throw new ArgumentNullException(nameof(openAIAssistantId));
+
+        storageAccountName = configuration["AzureServices:Storage:AccountName"] ?? throw new ArgumentNullException(nameof(storageAccountName));
+        storageAccountKey = configuration["AzureServices:Storage:AccountKey"] ?? throw new ArgumentNullException(nameof(storageAccountKey));
+        storageContainerName = configuration["AzureServices:Storage:ContainerName"] ?? throw new ArgumentNullException(nameof(storageContainerName));
 
         computerVisionClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(visionApiKey));
         computerVisionClient.Endpoint = visionEndpoint;
@@ -97,7 +108,7 @@ public class AccessibilityAnalyzer
     /// Analyzes HTML content from a URL for accessibility issues using Azure OpenAI (Chat)
     /// </summary>
     /// <param name="Url">Url</param>
-    /// <returns></returns>/// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     /// <exception cref="ArgumentException">Invalid URL</exception>
     /// <exception cref="Exception">General exception</exception>
     public async Task<WCAGResult> AnalyzeHtmlFromUrlWithChatAsync(string Url, bool extractHtmlFromUrl = false)
@@ -132,7 +143,7 @@ public class AccessibilityAnalyzer
     /// Analyzes HTML content from a URL for accessibility issues using Azure OpenAI (Assistant)
     /// </summary>
     /// <param name="Url">Url</param>
-    /// <returns></returns>/// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     /// <exception cref="ArgumentException">Invalid URL</exception>
     /// <exception cref="Exception">General exception</exception>
     public async Task<WCAGResult> AnalyzeHtmlFromUrlWithAssistantAsync(string Url, bool extractHtmlFromUrl = false)
@@ -164,10 +175,46 @@ public class AccessibilityAnalyzer
     }
 
     /// <summary>
+    /// Analyzes a document for accessibility issues using Azure OpenAI.
+    /// </summary>
+    /// <param name="fileContent">File content (byte array)</param>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public async Task<WCAGResult> AnalyzeDocumentlWithChatAsync(byte[] fileContent)
+    {
+        if (fileContent == null || fileContent.Length == 0)
+        {
+            throw new ArgumentException("File content cannot be empty.", nameof(fileContent));
+        }
+
+        string fileUrl = await UploadFile(fileContent);
+        return await AnalyzeHtmlWithChatAsync(fileUrl); 
+    }
+
+    /// <summary>
+    /// Analyzes a document for accessibility issues using Azure OpenAI (Assistant)
+    /// </summary>
+    /// <param name="fileContent">File content (byte array)</param>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public async Task<WCAGResult> AnalyzeDocumentlWithAssistantAsync(byte[] fileContent)
+    {
+        if (fileContent == null || fileContent.Length == 0)
+        {
+            throw new ArgumentException("File content cannot be empty.", nameof(fileContent));
+        }
+
+        string fileUrl = await UploadFile(fileContent);
+        return await AnalyzeHtmlWithAssistantAsync(fileUrl);
+    }
+
+    /// <summary>
     /// Analyzes HTML content for accessibility issues using Azure OpenAI.
     /// </summary>
     /// <param name="HtmlContent">Full HTML content</param>
-    /// <returns></returns>/// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <param name="sourceUrl">Full HTML content</param>
+    /// <param name="fileContent">Full HTML content</param>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     /// <exception cref="ArgumentException">Invalid URL</exception>
     /// <exception cref="Exception">General exception</exception>
     public async Task<WCAGResult> AnalyzeHtmlWithChatAsync(string UrlOrHtmlContent, string? sourceUrl = "")
@@ -178,43 +225,32 @@ public class AccessibilityAnalyzer
         }
 
         try
-        {
+        {                                   
             var chatClient = openAiClient.GetChatClient(azureOpenAIDeploymentName);
 
             // Prepare the prompt for the OpenAI model
-            string prompt = $@"Analyze the provided HTML content for any WCAG (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act) compliance issues. 
-                               The analysis should evaluate the entire HTML content, examining every element comprehensively. 
+            string promptResource = "AzureAI.WebAccessibilityTool.Resources.Prompt.txt";
 
-                                Response requirements:
-                                1. Format: The result must be a JSON object only
-                                2. Structure: The JSON object must include:
-                                    - `issues`: An array of objects, each containing:
-                                        - `Element`: The tag name of the HTML element (e.g., ""img"", ""div"", ""p"").
-                                        - `ElementAttributes`: An array with all the object attributes, each having:
-                                            - `Name`: The name of the attribute.
-                                            - `Value`: The value of the attribute.
-                                        - `Issue`: A brief description of the detected WCAG compliance issue.
-                                        - `Severity`: The severity level of the issue using ""Low"", ""Medium"", ""High"" or ""Improvement"".
-                                        - `Source`: The standard(s) that apply (e.g., ""WCAG 2.1"", ""ADA"", ""Section 508"").
-                                        - `Details`: Specific details or rules cited from WCAG, ADA, or Section 508 that justify the issue.
-                                        - `Recommendation`: A recommended action to resolve the issue.
-                                    - `Explanation`: A summary description explaining the context or overarching reasoning for the issues found (this is a single attribute, separate from the array).
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            if (assembly == null)
+                throw new Exception("Error loading the assembly to get the prompt file");
 
-                                3. Scope: Only include elements in the JSON response that have one or more detected WCAG issues. Ignore elements without issues.
-                                4. Analysis depth: All HTML elements and their attributes must be analyzed, but the response should exclude elements without issues to maintain brevity and relevance.
-                                                                                                
-                                Additional Information: The elements must be analyzed in the context of the entire HTML content and each element must be evaluated for WCAG compliance.
-                                Also, each element, like a img for instance, must be evaluated for its attributes like alt but in this case it should be check if the alt is present and has a minimal description.
-                                The same must be handle for hyperlinks (a tag) checking for a minimal description.                                
+            Stream? stream = assembly.GetManifestResourceStream(promptResource);
+            if (stream == null)
+                throw new Exception("Error loading the prompt resource file.");
 
-                                VERY IMPORTANT: The response must have only the JSON object itself. The response MUST NOT has anything else like a block of code or a markdown response. 
+            StreamReader reader = new StreamReader(stream);
+            if (reader == null)            
+                throw new Exception("Error reading the prompt resource file.");
 
-                                If a URL is provided instead of HTML content, retrieve the HTML content from the URL using a Python script that performs an HTTP GET request, and then proceed with the analysis.
+            string basePrompt = reader.ReadToEnd();                
 
-                                URL or HTML Content: 
-                               {UrlOrHtmlContent}";
+            if (string.IsNullOrEmpty(basePrompt))
+                throw new Exception("The prompt resource file is empty");
 
-            List<ChatMessage> messages = [new UserChatMessage(ChatMessageContentPart.CreateTextPart(prompt))];
+            string prompt = reader.ReadToEnd().Replace("#UrlOrHtmlContent", UrlOrHtmlContent);                        
+
+            List <ChatMessage> messages = [new UserChatMessage(ChatMessageContentPart.CreateTextPart(prompt))];
             ChatCompletion chatCompletion = await chatClient.CompleteChatAsync(messages);
 
             if (chatCompletion.Content.Count() == 0)
@@ -228,7 +264,7 @@ public class AccessibilityAnalyzer
         }
         catch (Exception ex)
         {
-            throw new Exception("Error analyzing HTML content using Azure OpenAI SDK.", ex);
+            throw new Exception("Error analyzing the content using Azure OpenAI.", ex);
         }
     }
 
@@ -236,7 +272,7 @@ public class AccessibilityAnalyzer
     /// Analyzes HTML content for accessibility issues using Azure OpenAI (Assistant)
     /// </summary>
     /// <param name="HtmlContent">Full HTML content</param>
-    /// <returns></returns>/// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
+    /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     /// <exception cref="ArgumentException">Invalid URL</exception>
     /// <exception cref="Exception">General exception</exception>
     public async Task<WCAGResult> AnalyzeHtmlWithAssistantAsync(string UrlOrHtmlContent, string? sourceUrl = "")
@@ -247,7 +283,7 @@ public class AccessibilityAnalyzer
         }
 
         try
-        {            
+        {
             var chatAssistance = await assistantClient.GetAssistantAsync(openAIAssistantId);
 
             Response<AssistantThread> threadResponse = await assistantClient.CreateThreadAsync();
@@ -272,6 +308,9 @@ public class AccessibilityAnalyzer
 
             foreach (ThreadMessage threadMessage in messages)
             {
+                if (!string.IsNullOrEmpty(rawResponse))
+                    break;
+
                 foreach (MessageContent contentItem in threadMessage.ContentItems)
                 {
                     if (contentItem is MessageTextContent textItem)
@@ -300,7 +339,7 @@ public class AccessibilityAnalyzer
         }
         catch (Exception ex)
         {
-            throw new Exception("Error analyzing HTML content using Azure OpenAI SDK.", ex);
+            throw new Exception("Error analyzing the content using Azure OpenAI (Assistant).", ex);
         }
     }
 
@@ -315,6 +354,12 @@ public class AccessibilityAnalyzer
         // Parse the response into a JSON object
         using JsonDocument document = JsonDocument.Parse(rawResponse);
         JsonElement root = document.RootElement;
+        
+        if (root.TryGetProperty("error", out JsonElement errorElement))
+        {
+            if (errorElement.ValueKind == JsonValueKind.String)
+                return new WCAGResult() { Items = new List<WCAGItem>(), Explanation = errorElement.GetString() ?? "" };
+        }
 
         // Extract issues and explanation from the JSON object
         List<WCAGItem> issues = new List<WCAGItem>();
@@ -554,4 +599,46 @@ public class AccessibilityAnalyzer
         return url;
     }
 
+    /// <summary>
+    /// Uploads a file to Azure Blob Storage and returns the URL.
+    /// </summary>
+    /// <param name="fileContent">File content (byte array)</param>
+    /// <returns>Blob URL with SAS</returns>
+    /// <exception cref="ArgumentException">File content is invalid</exception>
+    /// <exception cref="Exception">Error uploading file</exception>
+    private async Task<string> UploadFile(byte[] fileContent)
+    {
+        if (fileContent == null || fileContent.Length == 0)
+        {
+            throw new ArgumentException("File content cannot be empty.", nameof(fileContent));
+        }
+
+        try
+        {
+            var inspector = new ContentInspectorBuilder()
+            {
+                Definitions = MimeDetective.Definitions.Default.All()
+            }.Build();
+
+            var results = inspector.Inspect(fileContent);
+            var fileExtensions = results.ByFileExtension();
+            string fileExtension = fileExtensions == null || fileExtensions.Count() == 0 ? "unknown" : fileExtensions.FirstOrDefault()?.Extension ?? "";
+            string fileName = $"{Guid.NewGuid()}.{fileExtension}";
+
+            AzureBlob azureBlob = new AzureBlob(storageAccountName, storageAccountKey, storageContainerName);
+            await azureBlob.UploadFileWithSdkAsync(fileContent, fileName);
+
+            string blobUrl = SasGenerator.GenerateSasUri(storageAccountName,
+                                                         storageAccountKey,
+                                                         storageContainerName,
+                                                         fileName,
+                                                         DateTimeOffset.UtcNow.AddHours(1)).ToString();
+
+            return blobUrl;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error uploading file.", ex);
+        }
+    }
 }

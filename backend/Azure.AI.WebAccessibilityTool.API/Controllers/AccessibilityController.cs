@@ -24,11 +24,11 @@ public class AccessibilityController : ControllerBase
     }
     
     /// <summary>
-    /// Analyzes an image for accessibility issues based on its URL.
+    /// Analyzes an image for accessibility issues based on its URL using Azure Computer Vision
     /// </summary>
     /// <param name="input">The input containing the URL of the image to be analyzed.</param>
     /// <returns>A list of WCAG issues related to the image.</returns>
-    [HttpPost("fromImageUrl")]
+    [HttpPost("imageUrl")]
     public async Task<IActionResult> AnalyzeImage([FromBody] UrlInput input)
     {
         if (string.IsNullOrWhiteSpace(input?.Url))
@@ -48,7 +48,7 @@ public class AccessibilityController : ControllerBase
     }
 
     /// <summary>
-    /// Analyzes HTML content from a URL for accessibility issues and provides recommendations - using Chat
+    /// Analyzes HTML content from a URL for accessibility issues and provides recommendations using Azure OpenAI (ChatGPT)
     /// </summary>
     /// <param name="input">URL</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
@@ -73,7 +73,7 @@ public class AccessibilityController : ControllerBase
     }
 
     /// <summary>
-    /// Analyzes HTML content from a URL for accessibility issues and provides recommendations - using Chat
+    /// Analyzes HTML content from a URL for accessibility issues and provides recommendations using Azure OpenAI (ChatGPT Assistant)
     /// </summary>
     /// <param name="input">URL</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
@@ -98,7 +98,7 @@ public class AccessibilityController : ControllerBase
     }
 
     /// <summary>
-    /// Analyzes HTML content for accessibility issues and provides recommendations - using Chat
+    /// Analyzes HTML content for accessibility issues and provides recommendations using Azure OpenAI (ChatGPT)
     /// </summary>
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
@@ -123,7 +123,7 @@ public class AccessibilityController : ControllerBase
     }
 
     /// <summary>
-    /// Analyzes HTML content for accessibility issues and provides recommendations - using Assistant
+    /// Analyzes HTML content for accessibility issues and provides recommendations using Azure OpenAI (ChatGPT Assistant)
     /// </summary>
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
@@ -144,6 +144,60 @@ public class AccessibilityController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while analyzing the HTML content: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Analyzes an uploaded document for accessibility issues using Azure OpenAI (ChatGPT)
+    /// </summary>
+    /// <param name="file">The file to be analyzed.</param>
+    /// <returns>Issues and recommendations for the document's accessibility.</returns>
+    [HttpPost("documentWithChat")]
+    public async Task<IActionResult> AnalyzeDocumentWithChat(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("The uploaded file is empty or missing.");
+        }
+
+        try
+        {
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+
+            var result = await _analyzer.AnalyzeDocumentlWithChatAsync(memoryStream.ToArray());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while analyzing the document: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Analyzes an uploaded document for accessibility issues using Azure OpenAI (ChatGPT Assistant)
+    /// </summary>
+    /// <param name="file">The file to be analyzed.</param>
+    /// <returns>Issues and recommendations for the document's accessibility.</returns>
+    [HttpPost("documentWithAssistant")]
+    public async Task<IActionResult> AnalyzeDocumentWithAssistant(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("The uploaded file is empty or missing.");
+        }
+
+        try
+        {
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+
+            var result = await _analyzer.AnalyzeDocumentlWithAssistantAsync(memoryStream.ToArray());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while analyzing the document: {ex.Message}");
         }
     }
 }
