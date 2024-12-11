@@ -4,6 +4,7 @@ using AzureAI.WebAccessibilityTool.Services;
 using Xunit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using AzureAI.WebAccessibilityTool.Models;
 
 namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
 {
@@ -60,7 +61,13 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
             var emptyHtmlContent = string.Empty;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => analyzer.AnalyzeHtmlWithAssistantAsync(emptyHtmlContent));
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = string.Empty,
+            };
+
+            await Assert.ThrowsAsync<ArgumentException>(() => analyzer.AnalyzeWithAssistantAsync(analysisInput));
         }
 
         /// <summary>
@@ -71,10 +78,16 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
         public async Task AnalyzeHtml_ValidContent_ReturnsNoAdvisory()
         {
             // Arrange
-            var analyzer = new AccessibilityAnalyzer(_configuration);            
+            var analyzer = new AccessibilityAnalyzer(_configuration);
 
             // Act
-            var result = await analyzer.AnalyzeHtmlWithAssistantAsync(GlobalVariables.validHtmlContent);
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = string.Empty,
+            };
+
+            var result = await analyzer.AnalyzeWithAssistantAsync(analysisInput);
 
             // Assert            
             Assert.NotNull(result);
@@ -90,10 +103,16 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
         public async Task AnalyzeHtml_InvalidContent_ReturnsAdvisory()
         {
             // Arrange
-            var analyzer = new AccessibilityAnalyzer(_configuration);            
+            var analyzer = new AccessibilityAnalyzer(_configuration);
 
             // Act
-            var result = await analyzer.AnalyzeHtmlWithAssistantAsync(GlobalVariables.invalidHtmlContent);
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = GlobalVariables.invalidHtmlContent,
+            };
+
+            var result = await analyzer.AnalyzeWithAssistantAsync(analysisInput);
 
             // Assert            
             Assert.NotNull(result);

@@ -29,16 +29,16 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the URL of the image to be analyzed.</param>
     /// <returns>A list of WCAG issues related to the image.</returns>
     [HttpPost("imageUrl")]
-    public async Task<IActionResult> AnalyzeImage([FromBody] UrlInput input)
+    public async Task<IActionResult> AnalyzeImage([FromBody] string url)
     {
-        if (string.IsNullOrWhiteSpace(input?.Url))
-        {
-            return BadRequest("The URL cannot be null or empty.");
-        }
-
         try
         {
-            var results = await _analyzer.AnalyzeImageAsync(input.Url);
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return BadRequest("The URL cannot be null or empty.");
+            }
+
+            var results = await _analyzer.AnalyzeImageAsync(url);
             return Ok(results);
         }
         catch (Exception ex)
@@ -55,19 +55,27 @@ public class AccessibilityController : ControllerBase
     [HttpPost("urlWithChat")]
     public async Task<IActionResult> AnalyzeHtmlFromUrlWithChat([FromBody] UrlInput input)
     {
-        if (string.IsNullOrWhiteSpace(input?.Url))
-        {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation = "URL is empty" };
-            return BadRequest(wcagResult);
-        }
         try
         {
-            var result = await _analyzer.AnalyzeHtmlFromUrlWithChatAsync(input.Url, input.ExtractHtmlContentFromUrl ?? true);
+            if (string.IsNullOrWhiteSpace(input?.Url))
+            {
+                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "URL is empty" };
+                return BadRequest(wcagResult);
+            }
+
+            AnalysisInput analysisInput = new AnalysisInput() 
+            {
+                Type = AnalysisType.URL, 
+                URL = input.Url, 
+                ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+            };
+
+            var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation =$"An error occurred while analyzing the HTML content from the URL: {ex.Message}"  };
+            var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation =$"An error occurred while analyzing the HTML content from the URL: {ex.Message}"  };
             return StatusCode(500, wcagResult);
         }
     }
@@ -80,19 +88,28 @@ public class AccessibilityController : ControllerBase
     [HttpPost("urlWithAssistant")]
     public async Task<IActionResult> AnalyzeHtmlFromUrlWithAssistant([FromBody] UrlInput input)
     {
-        if (string.IsNullOrWhiteSpace(input?.Url))
-        {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation = "URL is empty" };
-            return BadRequest(wcagResult);
-        }
         try
         {
-            var result = await _analyzer.AnalyzeHtmlFromUrlWithAssistantAsync(input.Url, input.ExtractHtmlContentFromUrl ?? false);
+            if (string.IsNullOrWhiteSpace(input?.Url))
+            {
+                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "URL is empty" };
+                return BadRequest(wcagResult);
+            }
+
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.URL,
+                URL = input.Url,
+                ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+            };
+
+
+            var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation = $"An error occurred while analyzing the HTML content from the URL: {ex.Message}" };
+            var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = $"An error occurred while analyzing the HTML content from the URL: {ex.Message}" };
             return StatusCode(500, wcagResult);
         }
     }
@@ -103,17 +120,23 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithChat")]
-    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] HtmlInput input)
+    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] string htmlInput)
     {
-        if (string.IsNullOrWhiteSpace(input?.HtmlContent))
-        {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation = "HTML content is empty" };
-            return BadRequest(wcagResult);
-        }
-
         try
-        {            
-            var result = await _analyzer.AnalyzeHtmlWithChatAsync(input.HtmlContent);
+        {
+            if (string.IsNullOrWhiteSpace(htmlInput))
+            {
+                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "HTML content is empty" };
+                return BadRequest(wcagResult);
+            }
+
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,                
+                Content = htmlInput,
+            };
+
+            var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)
@@ -128,17 +151,23 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithAssistant")]
-    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] HtmlInput input)
+    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] string htmlInput)
     {
-        if (string.IsNullOrWhiteSpace(input?.HtmlContent))
-        {
-            var wcagResult = new WCAGResult() { Items = new List<WCAGItem>(), Explanation = "HTML content is empty" };
-            return BadRequest(wcagResult);
-        }
-
         try
         {
-            var result = await _analyzer.AnalyzeHtmlWithAssistantAsync(input.HtmlContent);
+            if (string.IsNullOrWhiteSpace(htmlInput))
+            {
+                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "HTML content is empty" };
+                return BadRequest(wcagResult);
+            }
+
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = htmlInput,
+            };
+
+            var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)
@@ -152,20 +181,26 @@ public class AccessibilityController : ControllerBase
     /// </summary>
     /// <param name="file">The file to be analyzed.</param>
     /// <returns>Issues and recommendations for the document's accessibility.</returns>
-    [HttpPost("documentWithChat")]
-    public async Task<IActionResult> AnalyzeDocumentWithChat(IFormFile file)
+    [HttpPost("pdfWithChat")]
+    public async Task<IActionResult> AnalyzePDFWithChat(IFormFile file)
     {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest("The uploaded file is empty or missing.");
-        }
-
         try
         {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("The uploaded file is empty or missing.");
+            }
+
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
 
-            var result = await _analyzer.AnalyzeDocumentlWithChatAsync(memoryStream.ToArray());
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.PDF,
+                FileContent = memoryStream.ToArray(),
+            };
+
+            var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)
@@ -179,20 +214,27 @@ public class AccessibilityController : ControllerBase
     /// </summary>
     /// <param name="file">The file to be analyzed.</param>
     /// <returns>Issues and recommendations for the document's accessibility.</returns>
-    [HttpPost("documentWithAssistant")]
-    public async Task<IActionResult> AnalyzeDocumentWithAssistant(IFormFile file)
+    [HttpPost("pdfWithAssistant")]
+    public async Task<IActionResult> AnalyzePDFWithAssistant(IFormFile file)
     {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest("The uploaded file is empty or missing.");
-        }
-
         try
         {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("The uploaded file is empty or missing.");
+            }
+
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
 
-            var result = await _analyzer.AnalyzeDocumentlWithAssistantAsync(memoryStream.ToArray());
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.PDF,
+                FileContent = memoryStream.ToArray(),
+            };
+
+
+            var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);
             return Ok(result);
         }
         catch (Exception ex)

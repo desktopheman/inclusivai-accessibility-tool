@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using AzureAI.WebAccessibilityTool.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using AzureAI.WebAccessibilityTool.Models;
 
 namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
 {
@@ -58,7 +59,13 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
             var emptyHtmlContent = string.Empty;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => analyzer.AnalyzeHtmlWithChatAsync(emptyHtmlContent));
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = string.Empty,
+            };
+
+            await Assert.ThrowsAsync<ArgumentException>(() => analyzer.AnalyzeWithChatAsync(analysisInput));
         }
 
         /// <summary>
@@ -70,9 +77,15 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
         {
             // Arrange
             var analyzer = new AccessibilityAnalyzer(_configuration);
-            
+
             // Act
-            var result = await analyzer.AnalyzeHtmlWithChatAsync(GlobalVariables.validHtmlContent);
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = GlobalVariables.validHtmlContent,
+            };
+
+            var result = await analyzer.AnalyzeWithChatAsync(analysisInput);
 
             // Assert            
             Assert.NotNull(result);
@@ -88,10 +101,16 @@ namespace AzureAI.WebAccessibilityTool.Tests.BusinessTests
         public async Task AnalyzeHtml_InvalidContent_ReturnsAdvisory()
         {
             // Arrange
-            var analyzer = new AccessibilityAnalyzer(_configuration);            
+            var analyzer = new AccessibilityAnalyzer(_configuration);
 
             // Act
-            var result = await analyzer.AnalyzeHtmlWithChatAsync(GlobalVariables.invalidHtmlContent);
+            AnalysisInput analysisInput = new AnalysisInput()
+            {
+                Type = AnalysisType.HTML,
+                Content = GlobalVariables.invalidHtmlContent,
+            };
+
+            var result = await analyzer.AnalyzeWithChatAsync(analysisInput);
 
             // Assert            
             Assert.NotNull(result);
