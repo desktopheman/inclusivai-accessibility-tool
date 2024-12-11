@@ -16,31 +16,31 @@ namespace AzureAI.WebAccessibilityTool.Tests
         
         public readonly static string invalidHtmlContent = $"<html><head><title>Test</title></head><body><img src='{testImageUrl}' /></body></html>";        
         public readonly static string emptyHtmlContent = string.Empty;
-        public readonly static string validHtmlContent = $@"<!DOCTYPE html>
-                                                            <html lang=""en"">
+        public readonly static string validHtmlContent = @"<!DOCTYPE html>
+                                                            <html lang='en'>
                                                             <head>
-                                                                <meta charset=""UTF-8"">
-                                                                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                                                                <meta name=""description"" content=""This is a test HTML document demonstrating proper accessibility practices."">
-                                                                <meta name=""author"" content=""Your Name"">
+                                                                <meta charset='UTF-8'>
+                                                                <meta name='viewport'  content='width=device-width, initial-scale=1.0'>
+                                                                <meta name='description'  content='This is a test HTML document demonstrating proper accessibility practices.'>
+                                                                <meta name='author'  content='Your Name'>
                                                                 <title>Accessibility Test</title>
                                                                 <style>
                                                                     /* Ensuring sufficient color contrast */
-                                                                    body {{
+                                                                    body {
                                                                         background-color: #ffffff;
                                                                         color: #1a1a1a; /* Dark gray text for good contrast */
                                                                         font-family: Arial, sans-serif;
-                                                                    }}
-                                                                    a {{
+                                                                    }
+                                                                    a {
                                                                         color: #0056b3; /* Blue for links */
                                                                         text-decoration: underline;
-                                                                    }}
-                                                                    a:focus, a:hover {{
+                                                                    }
+                                                                    a:focus, a:hover {
                                                                         color: #003d80; /* Darker blue for hover/focus state */
-                                                                    }}
-                                                                    figcaption {{
+                                                                    }
+                                                                    figcaption {
                                                                         color: #4d4d4d; /* Medium gray text for captions with sufficient contrast */
-                                                                    }}
+                                                                    }
                                                                 </style>
                                                             </head>
                                                             <body>
@@ -50,10 +50,10 @@ namespace AzureAI.WebAccessibilityTool.Tests
                                                                 <main>
                                                                     <figure>
                                                                         <img 
-                                                                            src=""{testImageUrl}"" 
-                                                                            alt=""A high-quality image showing a computer on a desk with multiple accessories, including a keyboard, mouse, and monitor displaying vivid colors and clear text."" 
-                                                                            width=""800"" 
-                                                                            height=""636""
+                                                                            src='https://www.w3.org/WAI/demos/bad/after/img/oldenburgstudentviolin34.jpg'  
+                                                                            alt='A high-quality image showing a computer on a desk with multiple accessories, including a keyboard, mouse, and monitor displaying vivid colors and clear text.'  
+                                                                            width='800'  
+                                                                            height='636' 
                                                                         />
                                                                         <figcaption>
                                                                             This image demonstrates a modern computer setup, featuring a clear visual presentation of accessories and text on the screen with appropriate contrast.
@@ -68,7 +68,7 @@ namespace AzureAI.WebAccessibilityTool.Tests
                                                                 <footer>
                                                                     <p>
                                                                         &copy; 2024 Accessibility Test. All rights reserved. 
-                                                                        <a href=""privacy-policy.html"">Read our Privacy Policy to understand how we handle your data and protect your privacy</a>.
+                                                                        <a href='privacy-policy.html'>Read our Privacy Policy to understand how we handle your data and protect your privacy</a>.
                                                                     </p>
                                                                 </footer>
                                                             </body>

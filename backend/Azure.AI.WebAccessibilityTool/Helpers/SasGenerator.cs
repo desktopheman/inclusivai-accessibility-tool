@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureAI.WebAccessibilityTool.Services;
+namespace AzureAI.WebAccessibilityTool.Helpers;
 
 public static class SasGenerator
 {

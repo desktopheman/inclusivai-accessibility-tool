@@ -4,12 +4,12 @@ namespace AzureAI.WebAccessibilityTool.Models;
 /// <summary>
 /// The result of a Web Content Accessibility Guidelines (WCAG) evaluation.
 /// </summary>
-public class WCAGResult
+public class AnalysisResult
 {
     /// <summary>
     /// The list of items that were evaluated.
     /// </summary>
-    public required List<WCAGItem> Items { get; set; }
+    public required List<AnalysisItem> Items { get; set; }
 
     /// <summary>
     /// The explanation of the evaluation.
@@ -17,7 +17,7 @@ public class WCAGResult
     public required string Explanation { get; set; }
 }
 
-public class WCAGItem
+public class AnalysisItem
 {
     /// <summary>
     /// The element that was evaluated.

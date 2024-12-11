@@ -42,11 +42,10 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);
-        var testInput = new UrlInput { Url = GlobalVariables.emptyUrl };
+        var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
-        var result = await controller.AnalyzeImage(testInput) as BadRequestObjectResult;
+        var result = await controller.AnalyzeImage(GlobalVariables.emptyUrl) as BadRequestObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -61,11 +60,10 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);
-        var testInput = new UrlInput { Url = GlobalVariables.testImageUrl };
+        var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
-        var result = await controller.AnalyzeImage(testInput) as OkObjectResult;
+        var result = await controller.AnalyzeImage(GlobalVariables.testImageUrl) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -83,11 +81,10 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);
-        var testInput = new HtmlInput { HtmlContent = GlobalVariables.emptyHtmlContent };
+        var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(testInput) as BadRequestObjectResult;
+        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.emptyHtmlContent) as BadRequestObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -102,18 +99,16 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);
-
-        var testInput = new HtmlInput { HtmlContent = GlobalVariables.validHtmlContent };
+        var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(testInput) as OkObjectResult;
+        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.validHtmlContent) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(200, result.StatusCode);
 
-        WCAGResult results = result.Value as WCAGResult ?? new WCAGResult { Items = new List<WCAGItem>(), Explanation = "" };
+        AnalysisResult results = result.Value as AnalysisResult ?? new AnalysisResult { Items = new List<AnalysisItem>(), Explanation = "" };
         var lowOrImprovementsResult = results.Items.Where(e => !e.Severity.Equals("Low") && !e.Severity.Equals("Improvement")).ToList();
         Assert.True(lowOrImprovementsResult.Count == 0);
     }
@@ -126,19 +121,17 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);
-
-        var testInput = new HtmlInput { HtmlContent = GlobalVariables.invalidHtmlContent };
+        var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
         // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(testInput) as OkObjectResult;
+        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.invalidHtmlContent) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(200, result.StatusCode);
 
-        WCAGResult results = result.Value as WCAGResult ?? new WCAGResult { Items = new List<WCAGItem>(), Explanation = "" };
+        AnalysisResult results = result.Value as AnalysisResult ?? new AnalysisResult { Items = new List<AnalysisItem>(), Explanation = "" };
         Assert.True(results.Items.Count > 0);
     }
 
@@ -181,7 +174,7 @@ public class AccessibilityControllerAssistantTests
         Assert.NotNull(result);
         Assert.Equal(200, result.StatusCode);
 
-        WCAGResult results = result.Value as WCAGResult ?? new WCAGResult { Items = new List<WCAGItem>(), Explanation = "" };
+        AnalysisResult results = result.Value as AnalysisResult ?? new AnalysisResult { Items = new List<AnalysisItem>(), Explanation = "" };
         var lowOrImprovementsResult = results.Items.Where(e => !e.Severity.Equals("Low") && !e.Severity.Equals("Improvement")).ToList();
         Assert.True(lowOrImprovementsResult.Count == 0);
     }
@@ -206,7 +199,7 @@ public class AccessibilityControllerAssistantTests
         Assert.NotNull(result);
         Assert.Equal(200, result.StatusCode);
 
-        WCAGResult results = result.Value as WCAGResult ?? new WCAGResult { Items = new List<WCAGItem>(), Explanation = "" };
+        AnalysisResult results = result.Value as AnalysisResult ?? new AnalysisResult { Items = new List<AnalysisItem>(), Explanation = "" };
         Assert.True(results.Items.Count > 0);
     }
 }

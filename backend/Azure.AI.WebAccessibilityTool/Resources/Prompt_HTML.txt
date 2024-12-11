@@ -1,4 +1,4 @@
-﻿Analyze the provided URL (File or Website) or HTML content for any WCAG (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act) compliance issues. 
+﻿Analyze the provided HTML content for any WCAG (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act) compliance issues. 
 The analysis should evaluate the entire HTML content, examining every element comprehensively. 
 
 Response requirements:
@@ -19,32 +19,15 @@ Response requirements:
 3. Scope: Only include elements in the JSON response that have one or more detected WCAG issues. Ignore elements without issues.
 4. Analysis depth: All HTML elements and their attributes must be analyzed, but the response should exclude elements without issues to maintain brevity and relevance.
                                                                                                 
-Additional Information: The elements must be analyzed in the context of the entire HTML content and each element must be evaluated for WCAG compliance.
+Additional Information: The elements must be analyzed in the context of the entire HTML content and each element must be evaluated for WCAG (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act) compliance.
 Also, each element, like a img for instance, must be evaluated for its attributes like alt but in this case it should be check if the alt is present and has a minimal description.
 The same must be handle for hyperlinks (a tag) checking for a minimal description.                                
 
 VERY IMPORTANT: The response must have only the JSON object itself. The response MUST NOT has anything else like a block of code or a markdown response. 
 
-If a URL is provided instead of HTML content, retrieve the HTML content from the given URL using an HTTP GET request and analyze it for WCAG, ADA, and Section 508 compliance issues. 
-Utilize the Code Interpreter and the fetch_html.py file, which contains a fetch_html function, to extract the HTML content from the URL.
-
----------------------
-import requests
-
-def fetch_html(url):
-    try:                                        
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()  
-        return response.text 
-    except requests.exceptions.RequestException as e:                                        
-        return None                                
----------------------
-
-In the same way, if the provided URL points to a document, such as a PDF or any other text-based format, Retrieve the HTML content from the given URL using an HTTP GET request, and then analyze it for WCAG, ADA, and Section 508 compliance issues.
-
 In case of an error or if a response cannot be provided, return a JSON object with a single attribute named 'error' containing the error message as its value.
 
 Always return the response as a JSON object
 
-Website URL, File URl or HTML Content: 
-#UrlOrHtmlContent
+URL or HTML Content: 
+#CONTENT
