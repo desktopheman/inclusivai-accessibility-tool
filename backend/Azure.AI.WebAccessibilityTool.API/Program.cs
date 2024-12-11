@@ -9,11 +9,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure services
         builder.Services.AddControllers();
         builder.Services.AddScoped<AccessibilityAnalyzer>(); // Business service injection
 
-        // Configure Swagger
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
@@ -27,12 +25,11 @@ public class Program
                     Name = "Fermin Piccolo",
                     Email = "frmpiccolo@gmail.com"
                 }
-            });
+            });            
         });
 
         var app = builder.Build();
-
-        // Configure middleware
+        
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
