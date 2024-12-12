@@ -14,4 +14,9 @@ public class UrlInput
     /// Gets or sets a value indicating whether to extract HTML content from the URL.
     /// </summary>
     public bool? ExtractHtmlContentFromUrl { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to get the image descriptions for alternative text.
+    /// </summary>
+    public bool? GetImageDescriptions { get; set; } = false;
 }

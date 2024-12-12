@@ -41,6 +41,10 @@ public class AnalysisInput
     /// </summary>
     public bool ExtractURLContent { get; set; } = false;
 
+    /// <summary>
+    /// Get the image descriptions for alternative text
+    /// </summary>
+    public bool GetImageDescriptions { get; set; } = false;
 }
 
 /// <summary>

@@ -68,6 +68,7 @@ public class AccessibilityController : ControllerBase
                 Type = AnalysisType.URL, 
                 URL = input.Url, 
                 ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+                GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
             var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
@@ -101,6 +102,7 @@ public class AccessibilityController : ControllerBase
                 Type = AnalysisType.URL,
                 URL = input.Url,
                 ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+                GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
 
@@ -120,7 +122,7 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithChat")]
-    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] string htmlInput)
+    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] string htmlInput, bool getImageDescriptions = false)
     {
         try
         {
@@ -134,6 +136,7 @@ public class AccessibilityController : ControllerBase
             {
                 Type = AnalysisType.HTML,                
                 Content = htmlInput,
+                GetImageDescriptions = getImageDescriptions
             };
 
             var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
@@ -151,7 +154,7 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithAssistant")]
-    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] string htmlInput)
+    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] string htmlInput, bool getImageDescriptions = false)
     {
         try
         {
@@ -165,6 +168,7 @@ public class AccessibilityController : ControllerBase
             {
                 Type = AnalysisType.HTML,
                 Content = htmlInput,
+                GetImageDescriptions = getImageDescriptions
             };
 
             var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);

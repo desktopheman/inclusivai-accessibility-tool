@@ -37,7 +37,7 @@ public class Program
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web Accessibility Tool API v1");
-                c.RoutePrefix = string.Empty; // Swagger UI root
+                c.RoutePrefix = string.Empty;                 
             });
         }
 

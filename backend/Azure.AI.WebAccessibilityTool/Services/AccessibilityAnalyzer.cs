@@ -2,19 +2,14 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Assistants;
 using AzureAI.WebAccessibilityTool.Models;
-using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
-using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Azure.AI.Vision.ImageAnalysis;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
 using System.ClientModel;
 using System.Text.Json;
-using HtmlAgilityPack;
-using Newtonsoft.Json.Linq;
 using System.Text;
-using System;
-using MimeDetective;
-using System.Reflection;
 using AzureAI.WebAccessibilityTool.Helpers;
+using SkiaSharp;
 
 namespace AzureAI.WebAccessibilityTool.Services;
 
@@ -28,7 +23,7 @@ public class AccessibilityAnalyzer
     private readonly string openAiEndpoint;
     private readonly string openAiApiKey;
 
-    private readonly ComputerVisionClient computerVisionClient;
+    private readonly ImageAnalysisClient imageAnalysisClient;
     private readonly AzureOpenAIClient openAiClient;
     private readonly AssistantsClient assistantClient;
 
@@ -57,8 +52,7 @@ public class AccessibilityAnalyzer
         storageAccountKey = configuration["AzureServices:Storage:AccountKey"] ?? throw new ArgumentNullException(nameof(storageAccountKey));
         storageContainerName = configuration["AzureServices:Storage:ContainerName"] ?? throw new ArgumentNullException(nameof(storageContainerName));
 
-        computerVisionClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(visionApiKey));
-        computerVisionClient.Endpoint = visionEndpoint;
+        imageAnalysisClient = new ImageAnalysisClient(new Uri(visionEndpoint), new AzureKeyCredential(visionApiKey));
 
         openAiClient = new AzureOpenAIClient(new Uri(openAiEndpoint), new ApiKeyCredential(openAiApiKey));
         assistantClient = new AssistantsClient(new Uri(openAiEndpoint), new AzureKeyCredential(openAiApiKey));
@@ -71,39 +65,50 @@ public class AccessibilityAnalyzer
     /// <returns>A list of strings with the image description.</returns>
     public async Task<List<string>> AnalyzeImageAsync(string imageUrl)
     {
+        List<string> descriptionList = new List<string>();
+
         try
-        {
-            if (string.IsNullOrEmpty(CheckAbsolteUrl(imageUrl)))
-            {
-                throw new ArgumentException($"Invalid image URL: {0}", imageUrl);
-            }
+        {                        
+            if (string.IsNullOrEmpty(HtmlHelper.CheckAbsolteUrl(imageUrl)))
+                return descriptionList;
 
             using HttpClient httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(imageUrl);
+            var response = await httpClient.GetAsync(imageUrl, HttpCompletionOption.ResponseHeadersRead);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                return new List<string>();
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound || !response.IsSuccessStatusCode)
+                return descriptionList;
+            
+            if (response.Content.Headers.ContentType?.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true)
+                return descriptionList;        
+            
+            if (response.Content.Headers.ContentLength > 6 * 1024 * 1024)
+                return descriptionList;
+            
+            using var imageStream = await response.Content.ReadAsStreamAsync();
+            using var skBitmap = SKBitmap.Decode(imageStream);
 
-            ImageAnalysis analysis = await computerVisionClient.AnalyzeImageAsync(imageUrl, [VisualFeatureTypes.Description]);
+            if (skBitmap.Width < 50 || skBitmap.Height < 50 || skBitmap.Width > 1000 || skBitmap.Height > 1000)            
+                return descriptionList;
+            
+            ImageAnalysisResult analysis = await imageAnalysisClient.AnalyzeAsync(new Uri(imageUrl),
+                                                                                  VisualFeatures.DenseCaptions,
+                                                                                  new ImageAnalysisOptions { GenderNeutralCaption = true });
 
-            // Validate and process response
+            // Processa a resposta
             var imageDescription = new List<string>();
 
-            if (analysis.Description?.Captions != null)
-            {
-                foreach (var caption in analysis.Description.Captions)
-                {
+            if (analysis.DenseCaptions != null)            
+                foreach (var caption in analysis.DenseCaptions.Values)                
                     imageDescription.Add(caption.Text);
-                }
-            }
 
             return imageDescription;
         }
-        catch (Exception ex)
+        catch 
         {
-            throw new Exception("Error analyzing image using Azure Computer Vision.", ex);
+            return descriptionList;
         }
     }
+
 
     /// <summary>
     /// Analyzes content for accessibility issues using Azure OpenAI.
@@ -125,7 +130,7 @@ public class AccessibilityAnalyzer
                 throw new Exception("No response from OpenAI.");
 
             string rawResponse = chatCompletion.Content[0].Text;
-            return ParseResponse(rawResponse, sourceUrl);
+            return await ParseResponse(rawResponse, sourceUrl, input.GetImageDescriptions);
         }
         catch (Exception ex)
         {
@@ -194,7 +199,7 @@ public class AccessibilityAnalyzer
             if (string.IsNullOrEmpty(rawResponse))
                 throw new Exception("No response from OpenAI.");
 
-            return ParseResponse(rawResponse, sourceUrl);
+            return await ParseResponse(rawResponse, sourceUrl, input.GetImageDescriptions);
         }
         catch (Exception ex)
         {
@@ -218,13 +223,13 @@ public class AccessibilityAnalyzer
             case AnalysisType.URL:
                 string url = input.URL;
 
-                if (string.IsNullOrEmpty(CheckAbsolteUrl(url)))
+                if (string.IsNullOrEmpty(HtmlHelper.CheckAbsolteUrl(url)))
                     throw new ArgumentException($"Invalid URL: {url}", nameof(url));
 
                 if (input.ExtractURLContent)
                 {
                     using HttpClient httpClient = new HttpClient();
-                    contentToAnalyze = CheckAndFixHtmlContent(url, await httpClient.GetStringAsync(url));
+                    contentToAnalyze = HtmlHelper.CheckAndFixHtmlContent(url, await httpClient.GetStringAsync(url));
                 }
                 else
                 {
@@ -251,7 +256,7 @@ public class AccessibilityAnalyzer
                     throw new ArgumentException("HTML content cannot be empty.", nameof(input.Content));
 
                 contentURL = input.URL;
-                contentToAnalyze = string.IsNullOrEmpty(contentURL) ? input.Content : CheckAndFixHtmlContent(contentURL, input.Content);                
+                contentToAnalyze = string.IsNullOrEmpty(contentURL) ? input.Content : HtmlHelper.CheckAndFixHtmlContent(contentURL, input.Content);                
                 resourceFileName = "Prompt_HTML.txt";
                 break;
         }
@@ -273,7 +278,7 @@ public class AccessibilityAnalyzer
     /// <param name="rawResponse">JSON content</param>
     /// <param name="url">Base URL</param>
     /// <returns></returns>
-    private AnalysisResult ParseResponse(string rawResponse, string? url = "")
+    private async Task<AnalysisResult> ParseResponse(string rawResponse, string? url = "", bool? getImageDescriptions = false)
     {
         // Parse the response into a JSON object
         using JsonDocument document = JsonDocument.Parse(rawResponse);
@@ -311,57 +316,58 @@ public class AccessibilityAnalyzer
                 Attributes = elementAttributes
             };
 
-            /*
-            if (item.Element.Equals("img") || item.Element.Equals("source"))
+
+            if (getImageDescriptions == true)
             {
-                // Lista de atributos relacionados à origem de imagens
-                var imageAttributes = new[] { "src", "data-cfsrc", "srcset" };
-
-                // Itera sobre os atributos da tag
-                foreach (var attribute in item.Attributes.Where(e => imageAttributes.Contains(e.Name)))
+                if (item.Element.Equals("img") || item.Element.Equals("source"))
                 {
-                    string imageUrl = attribute.Value ?? "";
+                    // Lista de atributos relacionados à origem de imagens
+                    var imageAttributes = new[] { "src", "href", "data-cfsrc", "srcset" };
 
-                    if (!string.IsNullOrEmpty(imageUrl))
+                    // Itera sobre os atributos da tag
+                    foreach (var attribute in item.Attributes.Where(e => imageAttributes.Contains(e.Name)))
                     {
-                        if (Uri.IsWellFormedUriString(imageUrl, UriKind.RelativeOrAbsolute))
-                        {
-                            string fullImageUrl = "";
-                            Uri? imageUri;
+                        string imageUrl = attribute.Value ?? "";
 
-                            if (Uri.TryCreate(imageUrl, UriKind.Absolute, out imageUri))
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            if (Uri.IsWellFormedUriString(imageUrl, UriKind.RelativeOrAbsolute))
                             {
-                                // Se a URL for absoluta, usa diretamente
-                                fullImageUrl = imageUri.ToString();
-                            }
-                            else if (Uri.TryCreate(imageUrl, UriKind.Relative, out imageUri))
-                            {
-                                // Se a URL for relativa, cria uma URL absoluta com base na URL base
-                                if (!string.IsNullOrEmpty(url))
+                                string fullImageUrl = "";
+                                Uri? imageUri;
+
+                                if (Uri.TryCreate(imageUrl, UriKind.Absolute, out imageUri))
                                 {
-                                    if (Uri.TryCreate(url, UriKind.Absolute, out var baseUri))
+                                    // Se a URL for absoluta, usa diretamente
+                                    fullImageUrl = imageUri.ToString();
+                                }
+                                else if (Uri.TryCreate(imageUrl, UriKind.Relative, out imageUri))
+                                {
+                                    // Se a URL for relativa, cria uma URL absoluta com base na URL base
+                                    if (!string.IsNullOrEmpty(url))
                                     {
-                                        Uri fullImageUri = new Uri(baseUri, imageUrl);
-                                        fullImageUrl = fullImageUri.ToString();
+                                        if (Uri.TryCreate(url, UriKind.Absolute, out var baseUri))
+                                        {
+                                            Uri fullImageUri = new Uri(baseUri, imageUrl);
+                                            fullImageUrl = fullImageUri.ToString();
+                                        }
+                                    }
+                                }
+
+                                if (!string.IsNullOrEmpty(fullImageUrl))
+                                {
+                                    List<string> result = await AnalyzeImageAsync(fullImageUrl);
+
+                                    if (result.Count > 0)
+                                    {
+                                        item.ImageDescriptionRecommendation = string.Join(", ", result);
                                     }
                                 }
                             }
-                            
-                            if (!string.IsNullOrEmpty(fullImageUrl))
-                            {
-                                // Analisa a imagem
-                                List<string> result = await AnalyzeImageAsync(fullImageUrl);
-
-                                if (result.Count > 0)
-                                {
-                                    item.ImageDescriptionRecommendation = string.Join(", ", result);
-                                }
-                            }                            
                         }
                     }
                 }
             }
-            */
 
             issues.Add(item);
         }
@@ -370,157 +376,5 @@ public class AccessibilityAnalyzer
         var response = new AnalysisResult() { Items = issues, Explanation = explanation };
 
         return response;
-    }
-
-    /// <summary>
-    /// Checks and fixes the HTML content by making all image-related URLs absolute.
-    /// </summary>
-    /// <param name="url">Source URL</param>
-    /// <param name="htmlContent">HTML content</param>
-    /// <returns>Checked and fixed HTML content</returns>    
-    private string CheckAndFixHtmlContent(string url, string htmlContent)
-    {
-        if (string.IsNullOrEmpty(CheckAbsolteUrl(url)))
-        {
-            throw new ArgumentException($"Invalid URL: {url}", nameof(url));
-        }
-
-        if (string.IsNullOrWhiteSpace(htmlContent))
-        {
-            throw new ArgumentException("HTML content cannot be null or empty.", nameof(htmlContent));
-        }
-
-        try
-        {
-            var baseUri = new Uri(url);
-            var htmlDoc = new HtmlDocument
-            {
-                OptionFixNestedTags = true,
-                OptionAutoCloseOnEnd = true,
-                OptionCheckSyntax = true
-            };
-
-            htmlDoc.LoadHtml(htmlContent);
-
-            // Process <img> tags
-            var imgTags = htmlDoc.DocumentNode.SelectNodes("//img");
-            if (imgTags != null)
-            {
-                foreach (var imgTag in imgTags)
-                {
-                    // Process src attribute
-                    var srcValue = imgTag.GetAttributeValue("src", string.Empty);
-                    if (!string.IsNullOrEmpty(srcValue) && !Uri.TryCreate(srcValue, UriKind.Absolute, out _))
-                    {
-                        var absoluteUrl = new Uri(baseUri, srcValue).ToString();
-                        imgTag.SetAttributeValue("src", absoluteUrl);
-                    }
-
-                    // Process data-cfsrc attribute
-                    var dataCfsrcValue = imgTag.GetAttributeValue("data-cfsrc", string.Empty);
-                    if (!string.IsNullOrEmpty(dataCfsrcValue) && !Uri.TryCreate(dataCfsrcValue, UriKind.Absolute, out _))
-                    {
-                        var absoluteUrl = new Uri(baseUri, dataCfsrcValue).ToString();
-                        imgTag.SetAttributeValue("data-cfsrc", absoluteUrl);
-                    }
-
-                    // Process srcset attribute
-                    var srcsetValue = imgTag.GetAttributeValue("srcset", string.Empty);
-                    if (!string.IsNullOrEmpty(srcsetValue))
-                    {
-                        var updatedSrcset = ProcessSrcsetAttribute(baseUri, srcsetValue);
-                        imgTag.SetAttributeValue("srcset", updatedSrcset);
-                    }
-                }
-            }
-
-            // Process <source> tags inside <picture>
-            var sourceTags = htmlDoc.DocumentNode.SelectNodes("//picture/source[@srcset]");
-            if (sourceTags != null)
-            {
-                foreach (var sourceTag in sourceTags)
-                {
-                    var srcsetValue = sourceTag.GetAttributeValue("srcset", string.Empty);
-                    if (!string.IsNullOrEmpty(srcsetValue))
-                    {
-                        var updatedSrcset = ProcessSrcsetAttribute(baseUri, srcsetValue);
-                        sourceTag.SetAttributeValue("srcset", updatedSrcset);
-                    }
-                }
-            }
-
-            return htmlDoc.DocumentNode.OuterHtml;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error processing HTML content.", ex);
-        }
-    }
-
-    /// <summary>
-    /// Processes the srcset attribute to convert all relative URLs to absolute.
-    /// </summary>
-    /// <param name="baseUri">Base URI</param>
-    /// <param name="srcsetValue">The srcset attribute value</param>
-    /// <returns>Updated srcset value with absolute URLs</returns>
-    private string ProcessSrcsetAttribute(Uri baseUri, string srcsetValue)
-    {
-        var parts = srcsetValue.Split(',');
-        var updatedParts = new List<string>();
-
-        foreach (var part in parts)
-        {
-            var trimmedPart = part.Trim();
-            var spaceIndex = trimmedPart.LastIndexOf(' ');
-
-            if (spaceIndex > 0)
-            {
-                // Separate URL and descriptor (e.g., "image.jpg 1x")
-                var urlPart = trimmedPart.Substring(0, spaceIndex).Trim();
-                var descriptorPart = trimmedPart.Substring(spaceIndex).Trim();
-
-                if (!Uri.TryCreate(urlPart, UriKind.Absolute, out _))
-                {
-                    // Make URL absolute
-                    urlPart = new Uri(baseUri, urlPart).ToString();
-                }
-
-                updatedParts.Add($"{urlPart} {descriptorPart}");
-            }
-            else
-            {
-                // Handle URLs without descriptors
-                if (!Uri.TryCreate(trimmedPart, UriKind.Absolute, out _))
-                {
-                    trimmedPart = new Uri(baseUri, trimmedPart).ToString();
-                }
-
-                updatedParts.Add(trimmedPart);
-            }
-        }
-
-        return string.Join(", ", updatedParts);
-    }
-
-    /// <summary>
-    /// Checks if the URL is absolute and returns it.
-    /// </summary>
-    /// <param name="urlToCheck">URL to check</param>
-    /// <returns>The absolute URL or an empty string</returns>
-    private string CheckAbsolteUrl(string urlToCheck)
-    {
-        string url = string.Empty;
-
-        if (Uri.IsWellFormedUriString(urlToCheck, UriKind.Absolute))
-        {
-            Uri? siteUri;
-
-            if (Uri.TryCreate(urlToCheck, UriKind.Absolute, out siteUri))
-            {
-                url = siteUri.ToString();
-            }
-        }
-
-        return url;
-    }
+    }    
 }
