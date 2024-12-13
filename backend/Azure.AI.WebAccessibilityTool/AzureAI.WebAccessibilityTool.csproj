@@ -8,10 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Prompt_URL.txt" />
     <EmbeddedResource Include="Resources\Prompt_HTML.txt" />
-    <EmbeddedResource Include="Resources\Prompt_Word.txt" />
-    <EmbeddedResource Include="Resources\Prompt_PDF.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +19,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Mime-Detective" Version="24.7.1" />
+    <PackageReference Include="PdfPig" Version="0.1.9" />
     <PackageReference Include="SkiaSharp" Version="3.116.1" />
   </ItemGroup>
 

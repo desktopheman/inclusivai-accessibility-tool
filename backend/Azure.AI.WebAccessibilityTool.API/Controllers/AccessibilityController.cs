@@ -34,16 +34,14 @@ public class AccessibilityController : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(url))
-            {
-                return BadRequest("The URL cannot be null or empty.");
-            }
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "URL is empty" });
 
             var results = await _analyzer.AnalyzeImageAsync(url);
             return Ok(results);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while analyzing the image: {ex.Message}");            
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message});            
         }
     }
 
@@ -58,16 +56,13 @@ public class AccessibilityController : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(input?.Url))
-            {
-                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "URL is empty" };
-                return BadRequest(wcagResult);
-            }
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "URL is empty" });
 
             AnalysisInput analysisInput = new AnalysisInput() 
             {
                 Type = AnalysisType.URL, 
                 URL = input.Url, 
-                ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+                ExtractURLContent = true,
                 GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
@@ -76,8 +71,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation =$"An error occurred while analyzing the HTML content from the URL: {ex.Message}"  };
-            return StatusCode(500, wcagResult);
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 
@@ -91,17 +85,14 @@ public class AccessibilityController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(input?.Url))
-            {
-                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "URL is empty" };
-                return BadRequest(wcagResult);
-            }
+            if (string.IsNullOrWhiteSpace(input?.Url))            
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "URL is empty" });            
 
             AnalysisInput analysisInput = new AnalysisInput()
             {
                 Type = AnalysisType.URL,
                 URL = input.Url,
-                ExtractURLContent = input.ExtractHtmlContentFromUrl ?? true,
+                ExtractURLContent = true,
                 GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
@@ -111,8 +102,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = $"An error occurred while analyzing the HTML content from the URL: {ex.Message}" };
-            return StatusCode(500, wcagResult);
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 
@@ -122,21 +112,18 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithChat")]
-    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] string htmlInput, bool getImageDescriptions = false)
+    public async Task<IActionResult> AnalyzeHtmlWithChat([FromBody] HtmlInput input)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(htmlInput))
-            {
-                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "HTML content is empty" };
-                return BadRequest(wcagResult);
-            }
+            if (string.IsNullOrWhiteSpace(input.Html))
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "HTML is empty" });
 
             AnalysisInput analysisInput = new AnalysisInput()
             {
                 Type = AnalysisType.HTML,                
-                Content = htmlInput,
-                GetImageDescriptions = getImageDescriptions
+                Content = input.Html,
+                GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
             var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
@@ -144,7 +131,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while analyzing the HTML content: {ex.Message}");
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 
@@ -154,21 +141,18 @@ public class AccessibilityController : ControllerBase
     /// <param name="input">The input containing the HTML content to be analyzed.</param>
     /// <returns>Issues and explanation on how to resolve WCAG issues in the HTML content.</returns>
     [HttpPost("htmlWithAssistant")]
-    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] string htmlInput, bool getImageDescriptions = false)
+    public async Task<IActionResult> AnalyzeHtmlWithAssistant([FromBody] HtmlInput input)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(htmlInput))
-            {
-                var wcagResult = new AnalysisResult() { Items = new List<AnalysisItem>(), Explanation = "HTML content is empty" };
-                return BadRequest(wcagResult);
-            }
+            if (string.IsNullOrWhiteSpace(input.Html))
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "HTML is empty" });
 
             AnalysisInput analysisInput = new AnalysisInput()
             {
                 Type = AnalysisType.HTML,
-                Content = htmlInput,
-                GetImageDescriptions = getImageDescriptions
+                Content = input.Html,                 
+                GetImageDescriptions = input.GetImageDescriptions ?? false
             };
 
             var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);
@@ -176,7 +160,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while analyzing the HTML content: {ex.Message}");
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 
@@ -191,9 +175,7 @@ public class AccessibilityController : ControllerBase
         try
         {
             if (file == null || file.Length == 0)
-            {
-                return BadRequest("The uploaded file is empty or missing.");
-            }
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "The uploaded file is empty or missing." });
 
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -202,6 +184,7 @@ public class AccessibilityController : ControllerBase
             {
                 Type = AnalysisType.PDF,
                 FileContent = memoryStream.ToArray(),
+                ExtractFileContent = true
             };
 
             var result = await _analyzer.AnalyzeWithChatAsync(analysisInput);
@@ -209,7 +192,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while analyzing the document: {ex.Message}");
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 
@@ -224,9 +207,7 @@ public class AccessibilityController : ControllerBase
         try
         {
             if (file == null || file.Length == 0)
-            {
-                return BadRequest("The uploaded file is empty or missing.");
-            }
+                return BadRequest(new ErrorOutput() { Code = "400", Message = "The uploaded file is empty or missing." });
 
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -235,7 +216,8 @@ public class AccessibilityController : ControllerBase
             {
                 Type = AnalysisType.PDF,
                 FileContent = memoryStream.ToArray(),
-            };
+                ExtractFileContent = true
+            }; 
 
 
             var result = await _analyzer.AnalyzeWithAssistantAsync(analysisInput);
@@ -243,7 +225,7 @@ public class AccessibilityController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while analyzing the document: {ex.Message}");
+            return StatusCode(500, new ErrorOutput() { Code = "500", Message = ex.Message });
         }
     }
 }
