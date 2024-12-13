@@ -82,10 +82,11 @@ public class AccessibilityControllerChatTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);        
+        var controller = new AccessibilityController(mockAnalyzer.Object);
 
         // Act
-        var result = await controller.AnalyzeHtmlWithChat(GlobalVariables.emptyHtmlContent) as BadRequestObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.emptyHtmlContent };
+        var result = await controller.AnalyzeHtmlWithChat(input) as BadRequestObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -103,7 +104,8 @@ public class AccessibilityControllerChatTests
         var controller = new AccessibilityController(mockAnalyzer.Object);
 
         // Act
-        var result = await controller.AnalyzeHtmlWithChat(GlobalVariables.validHtmlContent) as OkObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.validHtmlContent };
+        var result = await controller.AnalyzeHtmlWithChat(input) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -123,9 +125,10 @@ public class AccessibilityControllerChatTests
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
         var controller = new AccessibilityController(mockAnalyzer.Object);
-        
+
         // Act
-        var result = await controller.AnalyzeHtmlWithChat(GlobalVariables.invalidHtmlContent) as OkObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.invalidHtmlContent };
+        var result = await controller.AnalyzeHtmlWithChat(input) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);

@@ -84,7 +84,8 @@ public class AccessibilityControllerAssistantTests
         var controller = new AccessibilityController(mockAnalyzer.Object);        
 
         // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.emptyHtmlContent) as BadRequestObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.emptyHtmlContent };
+        var result = await controller.AnalyzeHtmlWithAssistant(input) as BadRequestObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -99,10 +100,11 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);        
+        var controller = new AccessibilityController(mockAnalyzer.Object);
 
         // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.validHtmlContent) as OkObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.validHtmlContent };
+        var result = await controller.AnalyzeHtmlWithAssistant(input) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -121,11 +123,11 @@ public class AccessibilityControllerAssistantTests
     {
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
-        var controller = new AccessibilityController(mockAnalyzer.Object);        
+        var controller = new AccessibilityController(mockAnalyzer.Object);
 
         // Act
-        // Act
-        var result = await controller.AnalyzeHtmlWithAssistant(GlobalVariables.invalidHtmlContent) as OkObjectResult;
+        HtmlInput input = new HtmlInput { Html = GlobalVariables.invalidHtmlContent };
+        var result = await controller.AnalyzeHtmlWithAssistant(input) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -165,7 +167,7 @@ public class AccessibilityControllerAssistantTests
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
         var controller = new AccessibilityController(mockAnalyzer.Object);
-        var urlInput = new UrlInput { Url = GlobalVariables.validUrl, ExtractHtmlContentFromUrl = false };
+        var urlInput = new UrlInput { Url = GlobalVariables.validUrl, GetImageDescriptions = true};
 
         // Act
         var result = await controller.AnalyzeHtmlFromUrlWithAssistant(urlInput) as OkObjectResult;
@@ -189,7 +191,7 @@ public class AccessibilityControllerAssistantTests
         // Arrange
         var mockAnalyzer = new Mock<AccessibilityAnalyzer>(_configuration);
         var controller = new AccessibilityController(mockAnalyzer.Object);
-        var urlInput = new UrlInput { Url = GlobalVariables.invalidUrl, ExtractHtmlContentFromUrl = false };
+        var urlInput = new UrlInput { Url = GlobalVariables.invalidUrl, GetImageDescriptions = true};
 
         // Act
         // Act
