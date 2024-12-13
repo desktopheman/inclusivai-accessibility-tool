@@ -199,11 +199,6 @@ jobs:
 - **Fermin Piccolo**
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
-- **Phillie Guimarães**
-  - [GitHub](https://github.com/phiguimaraes)
-  - [LinkedIn](https://www.linkedin.com/in/phillieguimar%C3%A3es/)
-- **Tiago Santiago**
-  - [GitHub](https://github.com/tsdes-santiago)
 
 ---
 
