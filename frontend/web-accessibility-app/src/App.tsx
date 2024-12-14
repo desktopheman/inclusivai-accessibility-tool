@@ -28,7 +28,15 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">InclusivAI</h1>
+        <h1 className="text-3xl font-bold text-gray-800">
+          <center>
+            <img
+              src="/images/logo.png"
+              alt="InclusivAI is an advanced AI-powered accessibility verification tool for websites. "
+              width={500}
+            />
+          </center>
+        </h1>
         <p>&nbsp;</p>
         <h2>
           <strong>InclusivAI</strong> is an advanced AI-powered accessibility
