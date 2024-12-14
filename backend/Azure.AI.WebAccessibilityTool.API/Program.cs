@@ -25,11 +25,27 @@ public class Program
                     Name = "Fermin Piccolo",
                     Email = "frmpiccolo@gmail.com"
                 }
-            });            
+            });
+        });
+
+        var allowedHosts = builder.Configuration.GetSection("AllowedHosts");
+        string allowedHostsString = allowedHosts.Value ?? "";
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowReactApp",
+                policy =>
+                {
+                    policy.WithOrigins(allowedHostsString)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
         });
 
         var app = builder.Build();
-        
+
+        app.UseCors("AllowReactApp");
+
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -37,7 +53,7 @@ public class Program
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web Accessibility Tool API v1");
-                c.RoutePrefix = string.Empty;                 
+                c.RoutePrefix = string.Empty;
             });
         }
 
