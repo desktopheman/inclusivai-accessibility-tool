@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, sans-serif; /* Override Tailwind's default font */
+  font-family: Arial, sans-serif; /* Substitui a fonte padrão do Tailwind */
   background-color: #f4f4f9;
   margin: 0;
   padding: 0;
@@ -18,17 +18,45 @@ h1 {
 }
 
 form {
-  @apply flex flex-col gap-3;
+  @apply flex flex-col items-center gap-4;
 }
 
-input[type="text"] {
-  @apply rounded-md border border-gray-300 p-2;
+.input-field {
+  @apply rounded-md border border-gray-300 p-2 w-80 shadow-sm;
 }
 
-button {
-  @apply cursor-pointer rounded-md border-none bg-blue-600 p-3 text-white;
+.submit-button {
+  @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition;
 }
 
-button:hover {
-  @apply bg-blue-800;
+.loading-text {
+  @apply text-center mt-4;
+}
+
+.result-container {
+  @apply mt-6;
+}
+
+.result-title {
+  @apply text-xl font-bold text-center mb-4;
+}
+
+.result-explanation {
+  @apply mb-4 text-center text-gray-600;
+}
+
+.issue-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.issue-card {
+  @apply p-4 border rounded shadow-sm bg-white hover:shadow-lg transition;
+}
+
+.issue-title {
+  @apply text-lg font-bold text-blue-500 mb-2;
+}
+
+.no-issues {
+  @apply text-center mt-4;
 }

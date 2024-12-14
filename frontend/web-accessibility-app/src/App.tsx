@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { WCAGResult } from "./types/Accessibility";
+import { AnalysisResult } from "./types/Accessibility";
 import "./styles/tailwind.css";
 
 import InputForm from "./components/InputForm";
@@ -9,15 +9,23 @@ import Results from "./components/Results";
 import api from "./api/api";
 
 const App: React.FC = () => {
-  const [results, setResults] = useState<WCAGResult[]>([]);
+  const [result, setResult] = useState<AnalysisResult>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAnalyze = async (url: string) => {
+    setIsLoading(true);
     try {
-      const response = await api.post("/image", { url });
-      setResults(response.data.results);
+      const payload = {
+        Url: url,
+        GetImageDescriptions: true,
+      };
+
+      const response = await api.post("accessibility/urlWithChat", payload);
+      setResult(response.data);
     } catch (error) {
-      console.error("Error analyzing URL:", error);
-      alert("Failed to analyze the URL. Please try again.");
+      alert("Failed to analyze the URL. Please try again. Error: " + error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -25,7 +33,11 @@ const App: React.FC = () => {
     <div className="App">
       <h1>Web Accessibility Tool</h1>
       <InputForm onAnalyze={handleAnalyze} />
-      <Results results={results} />
+      {isLoading ? (
+        <p className="loading-text">Analyzing...</p>
+      ) : (
+        <Results result={result} />
+      )}
     </div>
   );
 };

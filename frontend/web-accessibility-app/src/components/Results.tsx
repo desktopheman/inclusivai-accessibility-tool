@@ -1,24 +1,32 @@
 import React from "react";
-import { WCAGResult } from "../types/Accessibility";
+import { AnalysisResult } from "../types/Accessibility";
 
 interface ResultsProps {
-  results: WCAGResult[];
+  result: AnalysisResult | undefined;
 }
 
-const Results: React.FC<ResultsProps> = ({ results }) => {
-  if (!results || results.length === 0)
-    return <p>No accessibility issues found!</p>;
+const Results: React.FC<ResultsProps> = ({ result }) => {
+  if (!result) return <p className="no-issues">No accessibility issues</p>;
 
   return (
-    <div>
-      <h2>Analysis Results</h2>
-      <ul>
-        {results.map((result, index) => (
-          <li key={index}>
-            <strong>Issue:</strong> {result.issue} <br />
-            <strong>Recommendation:</strong> {result.recommendation} <br />
-            <strong>Severity:</strong> {result.severity}
-          </li>
+    <div className="result-container">
+      <h2 className="result-title">Resultados da Análise</h2>
+      <p className="result-explanation">{result.explanation}</p>
+      <ul className="list-disc list-inside">
+        {result.items.map((item, index) => (
+          <div key={index} className="issue-container">
+            <h3 className="font-bold text-lg">Issue #{index + 1}</h3>
+            <p>
+              <strong>Description:</strong> {item.issue}
+            </p>
+            <p>
+              <strong>Recommendation:</strong> {item.recommendation}
+            </p>
+            <p>
+              <strong>Severity:</strong> {item.severity}
+            </p>
+            <p>&nbsp;</p>
+          </div>
         ))}
       </ul>
     </div>

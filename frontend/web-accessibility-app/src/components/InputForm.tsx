@@ -5,7 +5,7 @@ interface InputFormProps {
 }
 
 const InputForm: React.FC<InputFormProps> = ({ onAnalyze }) => {
-  const [url, setUrl] = useState<string>(""); // State to store the URL entered by the user
+  const [url, setUrl] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,7 +14,9 @@ const InputForm: React.FC<InputFormProps> = ({ onAnalyze }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="urlInput">Website URL:</label>
+      <label htmlFor="urlInput" className="font-medium text-lg">
+        Enter the website URL
+      </label>
       <input
         id="urlInput"
         type="text"
@@ -22,8 +24,11 @@ const InputForm: React.FC<InputFormProps> = ({ onAnalyze }) => {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         required
+        className="input-field"
       />
-      <button type="submit">Analyze</button>
+      <button type="submit" className="submit-button">
+        Analyze
+      </button>
     </form>
   );
 };
