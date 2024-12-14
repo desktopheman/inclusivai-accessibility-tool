@@ -6,27 +6,46 @@ interface ResultsProps {
 }
 
 const Results: React.FC<ResultsProps> = ({ result }) => {
-  if (!result) return <p className="no-issues">No accessibility issues</p>;
+  if (result && (!result.items || result.items.length === 0)) {
+    // Display this message only when there are no issues
+    return <p className="no-issues">No accessibility issues detected</p>;
+  }
+
+  if (!result || !result.items || result.items.length === 0) {
+    // Do not display anything if the result is undefined or there are no items
+    return null;
+  }
 
   return (
     <div className="result-container">
-      <h2 className="result-title">Resultados da Análise</h2>
+      <h2 className="result-title">Analysis Results</h2>
       <p className="result-explanation">{result.explanation}</p>
-      <ul className="list-disc list-inside">
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {result.items.map((item, index) => (
-          <div key={index} className="issue-container">
-            <h3 className="font-bold text-lg">Issue #{index + 1}</h3>
+          <li key={index} className="issue-card">
+            <h3 className="issue-title">Issue #{index + 1}</h3>
             <p>
               <strong>Description:</strong> {item.issue}
             </p>
             <p>
-              <strong>Recommendation:</strong> {item.recommendation}
-            </p>
-            <p>
               <strong>Severity:</strong> {item.severity}
             </p>
-            <p>&nbsp;</p>
-          </div>
+            <p>
+              <strong>Recommendation:</strong> {item.recommendation}
+            </p>
+            {item.imageDescriptionRecommendation && (
+              <p>
+                <strong>Image description recommendation:</strong>{" "}
+                {item.imageDescriptionRecommendation}
+              </p>
+            )}
+            <p>
+              <strong>Source:</strong> {item.source}
+            </p>
+            <p>
+              <strong>Details:</strong> {item.details}
+            </p>
+          </li>
         ))}
       </ul>
     </div>

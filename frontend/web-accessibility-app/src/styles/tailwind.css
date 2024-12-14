@@ -2,61 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Global Styles */
 body {
-  font-family: Arial, sans-serif; /* Substitui a fonte padrão do Tailwind */
-  background-color: #f4f4f9;
-  margin: 0;
-  padding: 0;
+  @apply bg-gray-50 font-sans text-gray-800;
 }
 
 .App {
-  @apply mx-auto my-5 max-w-3xl rounded-lg border border-gray-300 bg-white p-5;
-}
-
-h1 {
-  @apply text-center text-2xl font-semibold text-gray-800;
-}
-
-form {
-  @apply flex flex-col items-center gap-4;
-}
-
-.input-field {
-  @apply rounded-md border border-gray-300 p-2 w-80 shadow-sm;
-}
-
-.submit-button {
-  @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition;
+  @apply max-w-4xl mx-auto p-6 rounded-md bg-white shadow-md;
 }
 
 .loading-text {
-  @apply text-center mt-4;
+  @apply text-center mt-4 text-blue-600 font-semibold;
+}
+
+.input-field {
+  @apply w-full p-3 border rounded-md shadow-sm border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+}
+
+.btn-primary {
+  @apply flex-1 py-3 px-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-md;
+}
+
+.btn-secondary {
+  @apply flex-1 py-3 px-6 text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-md;
 }
 
 .result-container {
-  @apply mt-6;
+  @apply mt-8 bg-white p-6 rounded-md shadow-md;
 }
 
 .result-title {
-  @apply text-xl font-bold text-center mb-4;
+  @apply text-2xl font-bold text-gray-800 text-center mb-4;
 }
 
 .result-explanation {
-  @apply mb-4 text-center text-gray-600;
-}
-
-.issue-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+  @apply text-center text-gray-600 mb-6;
 }
 
 .issue-card {
-  @apply p-4 border rounded shadow-sm bg-white hover:shadow-lg transition;
+  @apply p-4 border rounded-md shadow-sm bg-white hover:shadow-lg transition;
 }
 
 .issue-title {
-  @apply text-lg font-bold text-blue-500 mb-2;
+  @apply text-lg font-semibold text-blue-600 mb-2;
 }
 
 .no-issues {
-  @apply text-center mt-4;
+  @apply text-center text-green-600 font-bold mt-6;
 }
