@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 interface InputFormProps {
   handleAnalyze: (url: string, useAssistant: boolean) => void;
@@ -12,7 +13,12 @@ const InputForm: React.FC<InputFormProps> = ({ handleAnalyze }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <motion.div
+      className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <form className="flex flex-col gap-6">
         <label
           htmlFor="urlInput"
@@ -29,23 +35,27 @@ const InputForm: React.FC<InputFormProps> = ({ handleAnalyze }) => {
           className="input-field"
         />
         <div className="flex gap-4">
-          <button
+          <motion.button
             type="button"
             className="btn-primary"
             onClick={() => handleSubmit(false)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Analyze with OpenAI Chat
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className="btn-secondary"
             onClick={() => handleSubmit(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Analyze with OpenAI Assistant
-          </button>
+          </motion.button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

@@ -6,6 +6,7 @@ import InputForm from "./components/InputForm";
 import Results from "./components/Results";
 import Spinner from "./components/Spinner";
 import api from "./api/api";
+import { motion } from "framer-motion";
 
 const App: React.FC = () => {
   const [result, setResult] = useState<AnalysisResult>();
@@ -26,44 +27,33 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App">
+    <motion.div
+      className="App"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <header className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          <center>
-            <img
-              src="/images/logo.png"
-              alt="InclusivAI is an advanced AI-powered accessibility verification tool for websites. "
-              width={500}
-            />
-          </center>
+        <motion.img
+          src="/images/logo.png"
+          alt="InclusivAI logo"
+          className="mx-auto"
+          width={200}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        />
+        <h1 className="text-3xl font-bold text-gray-800 mt-4">
+          Accessibility Analyzer
         </h1>
-        <p>&nbsp;</p>
-        <h2>
-          <strong>InclusivAI</strong> is an advanced AI-powered accessibility
-          verification tool for websites. Leveraging Azure OpenAI with GPT-4,
-          InclusivAI provides comprehensive HTML analysis via chat and assistant
-          interfaces, identifying compliance issues with WCAG (Web Content
-          Accessibility Guidelines), ADA (Americans with Disabilities Act), and
-          Section 508 (Rehabilitation Act) standards.
-        </h2>
-        <h3>
-          Additionally, InclusivAI integrates Azure Computer Vision to
-          intelligently suggest alternative text (alt text) for images,
-          enhancing accessibility for visually impaired users. With its robust
-          and user-friendly approach, InclusivAI empowers developers and
-          organizations to create inclusive, accessible digital experiences.
-        </h3>
+        <p className="mt-2 text-gray-600">
+          Advanced AI-powered accessibility verification tool for websites and
+          PDF documents
+        </p>
       </header>
       <InputForm handleAnalyze={handleAnalyze} />
-      {isLoading ? (
-        <>
-          <p className="loading-text">Analyzing...</p>
-          <Spinner />
-        </>
-      ) : (
-        <Results result={result} />
-      )}
-    </div>
+      {isLoading ? <Spinner /> : <Results result={result} />}
+    </motion.div>
   );
 };
 
