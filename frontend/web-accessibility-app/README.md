@@ -30,6 +30,7 @@ This is the frontend application for the **Website Accessibility Solution**, bui
 ## Configuration
 
 1. Create a `.env` file in the root directory with the following content:
+
    ```env
    REACT_APP_BACKEND_API_URL=https://<your-backend-api-url>
    ```
@@ -41,17 +42,20 @@ This is the frontend application for the **Website Accessibility Solution**, bui
 ## Development Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-repo-name.git
 cd frontend/web-accessibility-app
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Start the Development Server
+
 ```bash
 npm start
 ```
@@ -59,6 +63,7 @@ npm start
 The application will be available at `http://localhost:3000`.
 
 ### 4. Run Unit Tests
+
 ```bash
 npm test
 ```
@@ -68,13 +73,17 @@ npm test
 ## Deployment
 
 ### 1. Build the Frontend
+
 Generate a production-ready build:
+
 ```bash
 npm run build
 ```
 
 ### 2. Deploy to Azure Static Web Apps
+
 Using the Azure CLI:
+
 ```bash
 az staticwebapp create --name <static-web-app-name> \
   --resource-group <resource-group> --source ./build \
@@ -117,16 +126,21 @@ frontend/web-accessibility-app/
 ### Backend Endpoints
 
 - **HTML Analysis**
+
   - **Endpoint**: `/api/accessibility/analyze`
   - **Method**: `POST`
   - **Example Usage**:
+
     ```typescript
-    import axios from 'axios';
+    import axios from "axios";
 
     const analyzeHtml = async (htmlContent: string) => {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze`, {
-        htmlContent,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze`,
+        {
+          htmlContent,
+        },
+      );
       return response.data;
     };
     ```
@@ -137,9 +151,12 @@ frontend/web-accessibility-app/
   - **Example Usage**:
     ```typescript
     const analyzeImage = async (imageUrl: string) => {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze-image`, {
-        imageUrl,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze-image`,
+        {
+          imageUrl,
+        },
+      );
       return response.data;
     };
     ```
@@ -153,6 +170,7 @@ Automate the deployment to Azure Static Web Apps using GitHub Actions.
 1. **Create a Workflow File**: `.github/workflows/frontend-deploy.yml`
 
 2. **Sample Workflow**:
+
 ```yaml
 name: Deploy Frontend
 on:
@@ -163,20 +181,20 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    - name: Install Dependencies
-      run: npm install
-    - name: Build Frontend
-      run: npm run build
-    - name: Deploy to Azure
-      run: |
-        az staticwebapp upload --name web-accessibility-app \
-                              --resource-group website-accessibility \
-                              --source ./frontend/web-accessibility-app/build
+      - uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: Install Dependencies
+        run: npm install
+      - name: Build Frontend
+        run: npm run build
+      - name: Deploy to Azure
+        run: |
+          az staticwebapp upload --name web-accessibility-app \
+                                --resource-group website-accessibility \
+                                --source ./frontend/web-accessibility-app/build
 ```
 
 3. **Secrets Configuration**:
@@ -187,11 +205,13 @@ jobs:
 ## Testing
 
 ### Run Tests
+
 ```bash
 npm test
 ```
 
 ### Testing Tools
+
 - **Jest**:
   - Unit testing framework for JavaScript and TypeScript.
 - **React Testing Library**:

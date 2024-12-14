@@ -50,3 +50,29 @@ body {
 .no-issues {
   @apply text-center text-green-600 font-bold mt-6;
 }
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-top: 2rem;
+}
+
+.spinner {
+  border: 4px solid #e5e7eb; /* light gray */
+  border-top: 4px solid #3b82f6; /* blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
