@@ -1,37 +1,46 @@
 <!doctype html>
-<html lang="en">
+<html lang="en"> <!-- Sets the primary language for assistive technologies -->
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/images/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
-    <meta name="theme-color" content="#2563eb" /> 
-
+    
+    <!-- Defines the theme color for browser UI elements -->
+    <meta name="theme-color" content="#2563eb" />
     <meta
       name="description"
-      content="InclusivAI is an advanced AI-powered tool for web accessibility verification, leveraging GPT-4 and Azure Computer Vision."
+      content="InclusivAI is an advanced AI-powered tool for verifying web accessibility compliance with WCAG, ADA, and Section 508."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/logo192.png" /> 
+    <!-- Title: Clear and descriptive for assistive technologies and SEO -->
+    <title>InclusivAI - Web Accessibility Analysis Tool for HTML and PDFs</title>
+    
+    <!-- Favicon for browsers and icons for other devices -->
+    <link rel="icon" href="%PUBLIC_URL%/images/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
-    <!-- SEO and Open Graph Metadata -->
-    <meta property="og:title" content="InclusivAI - Advanced Ai-powered Web Accessibility Checker for HTML and PD" />
+    
+    <!-- Open Graph Metadata for social sharing -->
+    <meta property="og:title" content="InclusivAI - Web Accessibility Checker" />
     <meta
       property="og:description"
-      content="InclusivAI helps developers ensure compliance with WCAG, ADA, and Section 508 standards, while suggesting AI-driven improvements for web accessibility."
+      content="InclusivAI helps developers verify and improve accessibility compliance for websites, HTML content, and PDF documents."
     />
     <meta property="og:image" content="%PUBLIC_URL%/images/logo192.png" />
     <meta property="og:url" content="https://inclusivai.com" />
     <meta property="og:type" content="website" />
-    <meta
-      name="twitter:description"
-      content="InclusivAI helps developers ensure compliance with WCAG, ADA, and Section 508 standards, while suggesting AI-driven improvements for web accessibility."
-    />
-    
-    <title>InclusivAI - Advanced Ai-powered Web Accessibility Checker for HTML and PDF</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this application.</noscript>
-    <div id="root"></div>
+    <!-- 
+      The noscript element provides a meaningful message for users with JavaScript disabled.
+      Added aria-label for assistive technologies to explain its purpose.
+    -->
+    <noscript aria-label="Enable JavaScript for application functionality">
+      JavaScript is required to run this application. Please enable it in your browser settings.
+    </noscript>
+    
+    <!-- 
+      Role="main" defines the primary content container for accessibility tools like screen readers. 
+      It helps users navigate directly to the main content.
+    -->
+    <div id="root" role="main"></div>
   </body>
 </html>
