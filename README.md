@@ -1,63 +1,76 @@
-# Website Accessibility Solution with AI
+# InclusivAI: Accessibility Verification Tool
 
-This repository provides a comprehensive solution for evaluating and improving website accessibility using Azure's AI services. It combines a robust backend built with .NET 8 and a modern frontend built with React to analyze website accessibility and generate actionable insights.
+InclusivAI is a powerful tool designed to verify and improve accessibility for specific URLs, HTML, and PDF files. Leveraging Azure AI services, InclusivAI ensures compliance with major accessibility standards, including:
+
+- **HTML**: WCAG (Web Content Accessibility Guidelines), ADA (Americans with Disabilities Act), and Section 508 (Rehabilitation Act).
+- **PDF**: PDF/UA (ISO 14289-1).
+
+InclusivAI uses cutting-edge technologies such as Azure OpenAI (GPT-4) for analysis and Azure Computer Vision for alternative text (alt) suggestions for images.
 
 ---
 
-> ⚠ **Disclaimer**: This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage to avoid unexpected charges.
+## Table of Contents
+
+1. [Features](#features)
+2. [Architecture](#architecture)
+3. [Getting Started](#getting-started)
+4. [Azure Resource Setup](#azure-resource-setup)
+5. [Local Development](#local-development)
+6. [Deployment](#deployment)
+7. [GitHub Actions for CI/CD](#github-actions-for-cicd)
+8. [Authors](#authors)
 
 ---
 
-## Project Scope
+## Features
 
-The solution aims to streamline the process of identifying and addressing website accessibility issues by leveraging cutting-edge Azure AI services. The key features include:
+- **AI-Powered Accessibility Analysis**:
+  - HTML accessibility checks against WCAG, ADA, and Section 508 standards.
+  - PDF validation against PDF/UA standards.
+- **Azure OpenAI Integration**: Chat assistant for HTML and PDF analysis.
+- **Azure Computer Vision**: Extracts and suggests alt texts for images.
+- **Comprehensive Reports**: Generate actionable insights for accessibility improvements.
 
-- **Azure OpenAI Integration**: Processes natural language for accessibility recommendations.
-- **Azure Computer Vision**: Analyzes visual content to detect potential accessibility barriers.
-- **Data Storage**: Uses Azure Blob Storage to manage accessibility reports and logs.
-- **Frontend Hosting**: Leverages Azure Static Web Apps for a responsive, interactive user interface.
-- **Backend Deployment**: Operates using Azure App Service for scalable API handling.
+---
+
+## Architecture
+
+### Backend
+- **Built with**: .NET 8
+- **Deployed on**: Azure App Service
+- **Key Modules**:
+  - Accessibility analysis services
+  - API controllers for frontend interaction
+
+### Frontend
+- **Built with**: React
+- **Deployed on**: Azure Static Web Apps
+- **Key Features**:
+  - User-friendly interface for submitting URLs, HTML, and PDF files.
+  - Displays detailed accessibility reports.
+
+---
+
+## Getting Started
+
+Follow these steps to set up InclusivAI locally and deploy to Azure.
 
 ---
 
 ## Azure Resource Setup
 
-Below are the Azure services and the step-by-step instructions to configure them via both the Azure Portal and Azure CLI.
-
-### 1. Create Computer Vision API
+### 1. Azure Computer Vision
 
 #### Azure Portal:
-1. Go to Azure Portal and search for "Cognitive Services."
-2. Click "Create" and select **Computer Vision** as the resource type.
-3. Fill in the required fields (resource group, region, etc.) and click "Review + Create."
-4. Navigate to the resource to retrieve the **API Key** and **Endpoint**.
+1. Search for "Cognitive Services" in the Azure Portal.
+2. Click "Create" and select **Computer Vision**.
+3. Configure the resource and retrieve the API Key and Endpoint.
 
 #### Azure CLI:
 ```bash
 az cognitiveservices account create --name <name> \
   --resource-group <resource-group> --kind ComputerVision \
-  --sku S1 --location <location> --yes
-```
-Retrieve the API Key and Endpoint:
-```bash
-az cognitiveservices account keys list --name <name> --resource-group <resource-group>
-```
-
----
-
-### 2. Create Azure OpenAI Service
-
-#### Azure Portal:
-1. Search for **Azure OpenAI** in the Azure Portal.
-2. Click "Create" and follow the instructions to deploy the resource.
-3. Assign access permissions under "Access Control (IAM)."
-4. Retrieve the **API Key** and **Endpoint**.
-
-#### Azure CLI:
-```bash
-az cognitiveservices account create --name <name> \
-  --resource-group <resource-group> --kind OpenAI \
-  --sku S1 --location <location> --yes
+  --sku S1 --location <location>
 ```
 Retrieve the API Key:
 ```bash
@@ -66,31 +79,45 @@ az cognitiveservices account keys list --name <name> --resource-group <resource-
 
 ---
 
-### 3. Create Blob Storage
+### 2. Azure OpenAI Service
 
 #### Azure Portal:
-1. Navigate to the Azure Portal and search for "Storage Accounts."
-2. Click "Create" and fill in the required fields.
-3. After creation, navigate to the resource, and create a **container** for logs and reports.
+1. Search for **Azure OpenAI** in the Azure Portal.
+2. Configure the service and retrieve the API Key and Endpoint.
+
+#### Azure CLI:
+```bash
+az cognitiveservices account create --name <name> \
+  --resource-group <resource-group> --kind OpenAI \
+  --sku S1 --location <location>
+```
+Retrieve the API Key:
+```bash
+az cognitiveservices account keys list --name <name> --resource-group <resource-group>
+```
+
+---
+
+### 3. Blob Storage
+
+#### Azure Portal:
+1. Create a new **Storage Account**.
+2. Add a **Container** for storing reports and logs.
 
 #### Azure CLI:
 ```bash
 az storage account create --name <name> \
-  --resource-group <resource-group> --location <location> --sku Standard_LRS
-```
-Create a container:
-```bash
+  --resource-group <resource-group> --sku Standard_LRS
 az storage container create --account-name <name> --name <container-name>
 ```
 
 ---
 
-### 4. Deploy App Service (Web App)
+### 4. Backend: Azure App Service
 
 #### Azure Portal:
-1. Search for "App Service" in the Azure Portal.
-2. Click "Create" and select **.NET 8 (LTS)** as the runtime stack.
-3. Configure the deployment settings and deploy the backend code.
+1. Create a new **App Service** and select **.NET 8** as the runtime.
+2. Deploy the backend API.
 
 #### Azure CLI:
 ```bash
@@ -100,11 +127,10 @@ az webapp create --name <app-name> --resource-group <resource-group> \
 
 ---
 
-### 5. Set Up Azure Static Web Apps
+### 5. Frontend: Azure Static Web Apps
 
 #### Azure Portal:
-1. Search for "Static Web Apps" in the Azure Portal.
-2. Click "Create" and follow the instructions to link your GitHub repository for CI/CD.
+1. Create a new **Static Web App** and link your GitHub repository.
 
 #### Azure CLI:
 ```bash
@@ -115,57 +141,10 @@ az staticwebapp create --name <static-web-app-name> \
 
 ---
 
-### 6. (Optional) Add Azure Functions
-
-#### Azure Portal:
-1. Search for "Function App" in the Azure Portal.
-2. Create a serverless function and configure the desired triggers.
-
-#### Azure CLI:
-```bash
-az functionapp create --name <function-app-name> \
-  --resource-group <resource-group> --consumption-plan-location <location>
-```
-
----
-
-## Solution Structure
-
-### Backend
-- **Path**: `/backend`
-- **Projects**:
-  - **`Azure.AI.WebAccessibilityTool`**:
-    - **`Models`**: Represents data models like `WCAGResult`.
-    - **`Services`**: Core logic for analyzing accessibility using Azure AI services.
-    - **`Utils`**: Helper classes for HTTP requests and other utilities.
-  - **`Azure.AI.WebAccessibilityTool.API`**:
-    - **`Controllers`**: Exposes API endpoints like `AccessibilityController`.
-    - **`appsettings.json`**: Configuration for Azure services (keys, endpoints, etc.).
-  - **`Azure.AI.WebAccessibilityTool.Tests`**:
-    - **`ApiTests`**: Tests for API endpoints.
-    - **`BusinessTests`**: Tests for backend logic and services.
-    - **`GlobalUsings.cs`**: Common usings for the test suite.
-
-### Frontend
-- **Path**: `/frontend/web-accessibility-app`
-- **Structure**:
-  - `/src`:
-    - **`api`**: API calls with Axios (`api.ts`).
-    - **`components`**: Reusable React components (`InputForm`, `Results`).
-    - **`styles`**: Tailwind CSS setup.
-    - **`types`**: TypeScript type definitions.
-  - `/public`: Static assets like `index.html`.
-  - **Configuration Files**:
-    - `.env`: Backend API URL.
-    - `tailwind.config.js`: Tailwind CSS configuration.
-    - `jest.config.js`: Jest testing configuration.
-
----
-
-## Getting Started
+## Local Development
 
 ### Backend Setup
-1. Navigate to `/backend`:
+1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
@@ -173,8 +152,8 @@ az functionapp create --name <function-app-name> \
    ```bash
    dotnet restore
    ```
-3. Update `appsettings.json` with Azure API keys and endpoints.
-4. Run the backend:
+3. Add Azure service keys to `appsettings.json`.
+4. Run the application:
    ```bash
    dotnet run
    ```
@@ -184,15 +163,15 @@ az functionapp create --name <function-app-name> \
    ```
 
 ### Frontend Setup
-1. Navigate to `/frontend/web-accessibility-app`:
+1. Navigate to the frontend directory:
    ```bash
-   cd frontend/web-accessibility-app
+   cd frontend
    ```
 2. Install dependencies:
    ```bash
    npm install
    ```
-3. Update `.env` with the backend API URL.
+3. Add backend API URL to `.env`.
 4. Start the development server:
    ```bash
    npm start
@@ -211,9 +190,9 @@ az functionapp create --name <function-app-name> \
    ```bash
    dotnet publish -c Release -o ./publish
    ```
-2. Deploy to Azure App Service:
+2. Deploy to Azure:
    ```bash
-   az webapp deploy --resource-group <resource-group> --name <app-name> --src-path ./publish
+   az webapp deploy --name <app-name> --resource-group <resource-group> --src-path ./publish
    ```
 
 ### Frontend Deployment
@@ -221,27 +200,18 @@ az functionapp create --name <function-app-name> \
    ```bash
    npm run build
    ```
-2. Deploy to Azure Static Web Apps:
+2. Deploy to Azure:
    ```bash
-   az staticwebapp update --name <static-web-app-name> --resource-group <resource-group> --source ./build
+   az staticwebapp upload --name <static-web-app-name> --resource-group <resource-group> --source ./build
    ```
 
-### GitHub Actions for Automated Deployment
+---
 
-This solution includes GitHub Actions workflows to automate the deployment process for both the backend and frontend. By using these workflows, you can ensure that your application is built and deployed to Azure every time a change is pushed to the `main` branch.
+## GitHub Actions for CI/CD
 
-#### Backend Deployment Workflow
+### Backend Workflow
+Automate backend deployment using GitHub Actions.
 
-The `backend-deploy.yml` workflow is used to build and deploy the backend API to Azure App Service. Below is an overview of how the workflow operates:
-
-- **Trigger**: The workflow runs on every push to the `main` branch.
-- **Steps**:
-  1. Check out the repository using the `actions/checkout` action.
-  2. Set up the .NET environment using the `actions/setup-dotnet` action with .NET 8.
-  3. Build the backend project.
-  4. Deploy the backend API to Azure App Service using the `az webapp deploy` CLI command.
-
-##### Workflow File (`.github/workflows/backend-deploy.yml`):
 ```yaml
 name: Deploy Backend
 on:
@@ -258,27 +228,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     - name: Build
-      run: dotnet build ./backend/WebAccessibility.Api/WebAccessibility.Api.csproj
+      run: dotnet build
     - name: Deploy to Azure
-      run: |
-        az webapp deploy --resource-group website-accessibility \
-                        --name web-accessibility-api \
-                        --src-path ./backend/WebAccessibility.Api/bin/Release/net8.0/publish
+      run: az webapp deploy --name <app-name> --resource-group <resource-group> --src-path ./publish
 ```
 
-#### Frontend Deployment Workflow
+### Frontend Workflow
+Automate frontend deployment using GitHub Actions.
 
-The `frontend-deploy.yml` workflow automates the build and deployment of the frontend to Azure Static Web Apps. Here's how it works:
-
-- **Trigger**: The workflow runs on every push to the `main` branch.
-- **Steps**:
-  1. Check out the repository using the `actions/checkout` action.
-  2. Set up the Node.js environment using the `actions/setup-node` action with Node.js version 16.
-  3. Install frontend dependencies.
-  4. Build the frontend using the `npm run build` command.
-  5. Deploy the built frontend to Azure Static Web Apps using the `az staticwebapp upload` CLI command.
-
-##### Workflow File (`.github/workflows/frontend-deploy.yml`):
 ```yaml
 name: Deploy Frontend
 on:
@@ -299,40 +256,8 @@ jobs:
     - name: Build
       run: npm run build
     - name: Deploy to Azure
-      run: |
-        az staticwebapp upload --name web-accessibility-app \
-                              --resource-group website-accessibility \
-                              --source ./frontend/build
+      run: az staticwebapp upload --name <static-web-app-name> --resource-group <resource-group> --source ./build
 ```
-
-#### How to Set Up GitHub Actions Workflows
-
-1. **Create the Workflow Files**:
-   - Place the `backend-deploy.yml` file in the `.github/workflows` directory.
-   - Place the `frontend-deploy.yml` file in the same directory.
-
-2. **Configure Azure CLI**:
-   - Ensure your GitHub Actions environment has access to your Azure subscription.
-   - Use the `az login` command locally and set up a service principal for automated access:
-     ```bash
-     az ad sp create-for-rbac --name "<github-actions-service-principal>" --role contributor \
-         --scopes /subscriptions/<subscription-id> --sdk-auth
-     ```
-   - Add the service principal credentials to your repository's secrets under the name `AZURE_CREDENTIALS`.
-
-3. **Monitor Deployments**:
-   - Navigate to the "Actions" tab in your GitHub repository to monitor the workflow runs.
-   - Successful runs will deploy the backend to Azure App Service and the frontend to Azure Static Web Apps.
-
-This automated deployment process ensures smooth CI/CD integration, saving time and reducing the chances of human error during deployment.
-
----
-
-## Disclaimer
-
----
-
-> ⚠ This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage to avoid unexpected charges.
 
 ---
 
@@ -341,5 +266,3 @@ This automated deployment process ensures smooth CI/CD integration, saving time 
 - **Fermin Piccolo**
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
-
-```

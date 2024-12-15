@@ -1,48 +1,79 @@
-# Backend for Website Accessibility Solution
+# InclusivAI Backend
 
-This is the backend API for the **Website Accessibility Solution**, designed to evaluate and improve website accessibility using Azure AI services. Built with .NET 8, the backend provides scalable and efficient endpoints for analyzing HTML content and generating accessibility insights.
+This repository contains the backend API for InclusivAI, a tool designed to verify and improve web accessibility. Built with **.NET 8**, the backend provides scalable, efficient endpoints to analyze HTML and PDF content, leveraging Azure AI services.
+
+---
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Prerequisites](#prerequisites)
+3. [Configuration](#configuration)
+4. [Local Development](#local-development)
+5. [Deployment](#deployment)
+6. [API Endpoints](#api-endpoints)
+7. [Project Structure](#project-structure)
+8. [CI/CD with GitHub Actions](#cicd-with-github-actions)
+9. [Authors](#authors)
 
 ---
 
 ## Features
 
-- **Azure OpenAI Integration**:
-  - Analyzes HTML content for WCAG issues and provides actionable recommendations.
-- **Azure Computer Vision**:
-  - Analyzes images for accessibility metadata, such as alt text suggestions.
-- **Scalable Deployment**:
-  - Built with .NET 8 for modern, high-performance API development.
-- **Data Models**:
-  - Supports structured analysis and recommendations through extensible models like `WCAGResult`.
+- **HTML and PDF Accessibility Analysis**:
+  - Analyze HTML content for WCAG, ADA, and Section 508 compliance.
+  - Validate PDF content against PDF/UA standards.
+- **AI-Driven Insights**:
+  - Integrates with **Azure OpenAI** to provide recommendations for accessibility issues.
+  - Uses **Azure Computer Vision** to extract alt text suggestions for images.
+- **Extensible Architecture**:
+  - Modular and scalable architecture built with .NET 8.
+- **Logging and Reports**:
+  - Pre-configured structure for generating reports and logs.
 
 ---
 
 ## Prerequisites
 
-1. **Azure Account**: Ensure you have an active Azure subscription.
+1. **Azure Account**: Active Azure subscription.
 2. **Azure Services**:
    - [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
    - [Azure Computer Vision](https://learn.microsoft.com/en-us/azure/cognitive-services/computer-vision/)
 3. **Development Environment**:
-   - .NET 8 SDK installed.
-   - Access to the Azure CLI.
+   - .NET 8 SDK.
+   - Azure CLI installed.
 
 ---
 
 ## Configuration
 
-Before running the backend, update the `appsettings.json` file with the following:
+Before running the backend, configure your Azure services in `appsettings.json` and `appsettings.Development.json`:
 
 ```json
 {
   "AzureServices": {
     "ComputerVision": {
-      "Endpoint": "https://<your-computer-vision-endpoint>",
-      "ApiKey": "<your-computer-vision-api-key>"
+      "Endpoint": "https://<your-computer-vision-endpoint>.cognitiveservices.azure.com/",
+      "ApiKey": "<your-computer-vision-key>"
     },
     "OpenAI": {
-      "Endpoint": "https://<your-openai-endpoint>",
-      "ApiKey": "<your-openai-api-key>"
+      "Endpoint": "https://<your-openai-endpoint>.openai.azure.com/",
+      "ApiKey": "<your-openai-key>",
+      "DeploymentName": "<your-openai-deployment-name>",
+      "AssistantId": "<your-openai-assistant-id>"
+    },
+    "Storage": {
+      "AccountName": "<your-storage-account-name>",
+      "AccountKey": "<your-storage-account-key>",
+      "ContainerName": "<your-storage-container-name>"
+    }
+  },
+  "AllowedHosts": "*",
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
     }
   }
 }
@@ -50,25 +81,29 @@ Before running the backend, update the `appsettings.json` file with the followin
 
 ---
 
-## Development Setup
+## Local Development
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-repo-name.git
 cd backend
 ```
 
 ### 2. Restore Dependencies
+
 ```bash
 dotnet restore
 ```
 
 ### 3. Run the Backend
+
 ```bash
-dotnet run
+dotnet run --project AzureAI.WebAccessibilityTool.API
 ```
 
 ### 4. Run Unit Tests
+
 ```bash
 dotnet test
 ```
@@ -78,16 +113,18 @@ dotnet test
 ## Deployment
 
 ### 1. Publish the Backend
+
 Generate a production-ready build:
+
 ```bash
 dotnet publish -c Release -o ./publish
 ```
 
 ### 2. Deploy to Azure App Service
-Using the Azure CLI:
+
 ```bash
 az webapp create --name <app-name> --resource-group <resource-group> \
-  --runtime "DOTNET|8" --plan <app-service-plan>"
+  --runtime "DOTNET|8" --plan <app-service-plan>
 az webapp deploy --name <app-name> --resource-group <resource-group> --src-path ./publish
 ```
 
@@ -97,45 +134,44 @@ az webapp deploy --name <app-name> --resource-group <resource-group> --src-path 
 
 ### Analyze HTML
 **POST** `/api/accessibility/analyze`
-- **Request Body**: 
-  ```json
-  {
-    "htmlContent": "<html>...</html>"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "issues": [
-      {
-        "element": "img", 
-        "attributes": [
-          { "name": "src", "value": "https://example.com/image.png" }
-        ], 
-        "issue": "Missing alt attribute",
-        "severity": "High",
-        "recommendation": "Add an alt attribute with a meaningful description.", 
-        "imageDescriptionRecommendation": "This image demonstrates a modern computer setup, featuring a clear visual presentation of accessories and text on the screen with appropriate contrast."
-      }
-    ],
-    "explanation": "The HTML contains images without alt attributes, which are essential for screen readers."
-  }
-  ```
+
+**Request Body**:
+```json
+{
+  "htmlContent": "<html>...</html>"
+}
+```
+
+**Response**:
+```json
+{
+  "issues": [
+    {
+      "element": "img",
+      "issue": "Missing alt attribute",
+      "recommendation": "Add alt text for better accessibility."
+    }
+  ],
+  "summary": "Found 3 critical accessibility issues."
+}
+```
 
 ### Analyze Image
 **POST** `/api/accessibility/analyze-image`
-- **Request Body**:
-  ```json
-  {
-    "imageUrl": "https://example.com/image.jpg"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "descriptions": ["A scenic view of mountains during sunset."]
-  }
-  ```
+
+**Request Body**:
+```json
+{
+  "imageUrl": "https://example.com/image.png"
+}
+```
+
+**Response**:
+```json
+{
+  "suggestedAltText": "A modern office setup with a laptop and desk accessories."
+}
+```
 
 ---
 
@@ -143,28 +179,49 @@ az webapp deploy --name <app-name> --resource-group <resource-group> --src-path 
 
 ```plaintext
 backend/
-├── Azure.AI.WebAccessibilityTool/          # Core library with models and services
-│   ├── Models/                             # Data models (e.g., WCAGResult)
-│   ├── Services/                           # Business logic for Azure integration
-├── Azure.AI.WebAccessibilityTool.API/      # API layer exposing endpoints
-│   ├── Controllers/                        # API controllers (e.g., AccessibilityController)
-│   └── appsettings.json                    # Azure configuration
-└── Azure.AI.WebAccessibilityTool.Tests/    # Unit tests
-    ├── ApiTests/                           # API endpoint tests
-    ├── BusinessTests/                      # Service logic tests
-    └── GlobalUsings.cs                     # Common using directives
+├── src/
+│   ├── AzureAI.WebAccessibilityTool/      # Core library
+│   │   ├── Helpers/                       # Helper classes
+│   │   │   ├── AzureBlob.cs
+│   │   │   ├── FileHelper.cs
+│   │   │   ├── HtmlHelper.cs
+│   │   │   ├── PdfHelper.cs
+│   │   │   ├── ResourceHelper.cs
+│   │   │   └── SasGenerator.cs
+│   │   ├── Models/                        # Data models
+│   │   │   ├── AnalysisInput.cs
+│   │   │   └── AnalysisResult.cs
+│   │   ├── Resources/                     # Prompt templates
+│   │   │   ├── Prompt_HTML.txt
+│   │   │   └── Prompt_PDF.txt
+│   │   └── Services/                      # Business logic
+│   │       └── AccessibilityAnalyzer.cs
+│   ├── AzureAI.WebAccessibilityTool.API/  # API layer
+│   │   ├── Controllers/                   # API endpoints
+│   │   │   └── AccessibilityController.cs
+│   │   ├── Models/                        # API-specific models
+│   │   │   ├── ErrorOutput.cs
+│   │   │   ├── HtmlInput.cs
+│   │   │   └── UrlInput.cs
+│   │   ├── appsettings.json               # Configuration
+│   │   ├── appsettings.Development.json   # Dev configuration
+│   │   └── Program.cs                     # Main entry point
+├── tests/
+│   └── AzureAI.WebAccessibilityTool.Tests # Unit tests
+│       ├── ApiTests/                      # API tests
+│       ├── BusinessTests/                 # Service tests
+│       └── GlobalUsings.cs                # Common usings
+└── AzureAI.WebAccessibilityTool.sln       # Solution file
 ```
 
 ---
 
 ## CI/CD with GitHub Actions
 
-### Backend Deployment Workflow
-Automate deployment to Azure App Service using GitHub Actions.
+Automate deployment to Azure App Service.
 
-1. **Create a Workflow File**: `.github/workflows/backend-deploy.yml`
+**Workflow File**: `.github/workflows/backend-deploy.yml`
 
-2. **Sample Workflow**:
 ```yaml
 name: Deploy Backend
 on:
@@ -175,22 +232,19 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
-    - name: Build
-      run: dotnet build ./backend/WebAccessibility.Api/WebAccessibility.Api.csproj
-    - name: Deploy to Azure
-      run: |
-        az webapp deploy --resource-group website-accessibility \
-                        --name web-accessibility-api \
-                        --src-path ./backend/WebAccessibility.Api/bin/Release/net8.0/publish
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build
+        run: dotnet build ./src/AzureAI.WebAccessibilityTool.API/AzureAI.WebAccessibilityTool.API.csproj
+      - name: Deploy to Azure
+        run: |
+          az webapp deploy --resource-group inclusivai-resources \
+                          --name inclusivai-backend-api \
+                          --src-path ./src/AzureAI.WebAccessibilityTool.API/bin/Release/net8.0/publish
 ```
-
-3. **Secrets Configuration**:
-   - Add `AZURE_CREDENTIALS` to your repository's secrets with Azure Service Principal credentials.
 
 ---
 
@@ -199,7 +253,3 @@ jobs:
 - **Fermin Piccolo**
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
-
----
-
-> ⚠ **Disclaimer**: This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage.

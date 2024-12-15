@@ -1,20 +1,35 @@
-# Frontend for Website Accessibility Solution
+# InclusivAI Frontend
 
-This is the frontend application for the **Website Accessibility Solution**, built with React. It provides an interactive user interface to analyze website accessibility, visualize WCAG issues, and receive actionable insights.
+This repository contains the frontend application for InclusivAI, a tool designed to evaluate and improve web accessibility. Built with React, the frontend provides an intuitive interface to analyze accessibility issues and visualize actionable insights for both HTML and PDF content.
+
+---
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Prerequisites](#prerequisites)
+3. [Configuration](#configuration)
+4. [Local Development](#local-development)
+5. [Deployment](#deployment)
+6. [Project Structure](#project-structure)
+7. [API Integration](#api-integration)
+8. [CI/CD with GitHub Actions](#cicd-with-github-actions)
+9. [Authors](#authors)
 
 ---
 
 ## Features
 
-- **Interactive Analysis**:
-  - Upload HTML content for accessibility analysis.
-  - View WCAG issues and recommendations in real-time.
-- **Image Analysis**:
-  - Analyze image URLs for accessibility metadata like `alt` text suggestions.
+- **Accessibility Analysis**:
+  - Upload and analyze HTML and PDF files.
+  - Visualize WCAG and PDF/UA compliance issues.
+- **AI-Driven Suggestions**:
+  - Leverages Azure Computer Vision for alt text suggestions.
+  - Provides recommendations powered by Azure OpenAI.
 - **Responsive Design**:
   - Optimized for desktop and mobile using Tailwind CSS.
 - **API Integration**:
-  - Connects to the backend API for analysis using Axios.
+  - Connects to the backend API for accessibility analysis.
 - **Hosting**:
   - Deployed using Azure Static Web Apps for seamless scalability.
 
@@ -23,7 +38,7 @@ This is the frontend application for the **Website Accessibility Solution**, bui
 ## Prerequisites
 
 1. **Node.js**: Ensure Node.js (v16 or above) is installed.
-2. **Backend API**: The backend API must be deployed and accessible.
+2. **Backend API**: The InclusivAI backend must be running and accessible.
 
 ---
 
@@ -39,13 +54,13 @@ This is the frontend application for the **Website Accessibility Solution**, bui
 
 ---
 
-## Development Setup
+## Local Development
 
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-repo-name.git
-cd frontend/web-accessibility-app
+cd frontend
 ```
 
 ### 2. Install Dependencies
@@ -95,28 +110,39 @@ az staticwebapp create --name <static-web-app-name> \
 ## Project Structure
 
 ```plaintext
-frontend/web-accessibility-app/
+frontend/
 ├── public/                          # Static assets
+│   ├── images/                      # Image assets
 │   ├── index.html                   # Main HTML file
-│   └── favicon.ico                  # Favicon
+│   ├── manifest.json                # Web manifest
+│   └── robots.txt                   # Robots configuration
 ├── src/                             # Source files
 │   ├── api/                         # API integration using Axios
 │   │   └── api.ts                   # Functions to call backend endpoints
 │   ├── components/                  # Reusable React components
-│   │   ├── InputForm.tsx            # Component for HTML input
+│   │   ├── InputForm.tsx            # Component for input submission
 │   │   ├── Results.tsx              # Component to display analysis results
-│   │   └── Header.tsx               # Application header
+│   │   └── Spinner.tsx              # Loading spinner component
 │   ├── styles/                      # Tailwind CSS styles
-│   │   └── global.css               # Global CSS overrides
+│   │   └── tailwind.css             # Tailwind CSS configuration
 │   ├── types/                       # TypeScript type definitions
-│   │   └── wcag.d.ts                # Types for WCAG issues and results
+│   │   ├── App.tsx                  # Main App types
+│   │   ├── index.tsx                # Entry point types
+│   │   └── react-app-env.d.ts       # React environment types
 │   ├── App.tsx                      # Main application component
 │   ├── index.tsx                    # Application entry point
-│   └── reportWebVitals.ts           # Performance measurement
+│   ├── tailwind.config.js           # Tailwind configuration
+│   └── setupTests.ts                # Testing setup file
 ├── .env                             # Environment variables
+├── .eslintrc.js                     # ESLint configuration
+├── .gitignore                       # Git ignore file
+├── LICENSE                          # License file
 ├── package.json                     # Node.js project configuration
-├── tailwind.config.js               # Tailwind CSS configuration
-└── tsconfig.json                    # TypeScript configuration
+├── package-lock.json                # Lock file for npm
+├── postcss.config.js                # PostCSS configuration
+├── README.md                        # Documentation file
+├── tsconfig.json                    # TypeScript configuration
+└── tailwind.config.js               # Tailwind CSS config
 ```
 
 ---
@@ -125,41 +151,124 @@ frontend/web-accessibility-app/
 
 ### Backend Endpoints
 
-- **HTML Analysis**
+#### Analyze Image
+**POST** `/api/accessibility/imageUrl`
 
-  - **Endpoint**: `/api/accessibility/analyze`
-  - **Method**: `POST`
-  - **Example Usage**:
+**Request Body**:
+```json
+{
+  "url": "https://example.com/image.png"
+}
+```
 
-    ```typescript
-    import axios from "axios";
+**Response**:
+```json
+{
+  "suggestedAltText": "A modern office setup with a laptop and desk accessories."
+}
+```
 
-    const analyzeHtml = async (htmlContent: string) => {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze`,
-        {
-          htmlContent,
-        },
-      );
-      return response.data;
-    };
-    ```
+---
 
-- **Image Analysis**
-  - **Endpoint**: `/api/accessibility/analyze-image`
-  - **Method**: `POST`
-  - **Example Usage**:
-    ```typescript
-    const analyzeImage = async (imageUrl: string) => {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_API_URL}/api/accessibility/analyze-image`,
-        {
-          imageUrl,
-        },
-      );
-      return response.data;
-    };
-    ```
+#### Analyze HTML from URL (Chat)
+**POST** `/api/accessibility/urlWithChat`
+
+**Request Body**:
+```json
+{
+  "url": "https://example.com",
+  "getImageDescriptions": true
+}
+```
+
+**Response**:
+```json
+{
+  "issues": [
+    {
+      "element": "img",
+      "issue": "Missing alt attribute",
+      "recommendation": "Add alt text for better accessibility."
+    }
+  ],
+  "summary": "Found accessibility issues on the provided URL."
+}
+```
+
+---
+
+#### Analyze HTML from URL (Assistant)
+**POST** `/api/accessibility/urlWithAssistant`
+
+**Request Body**:
+```json
+{
+  "url": "https://example.com",
+  "getImageDescriptions": true
+}
+```
+
+**Response**:
+```json
+{
+  "issues": [
+    {
+      "element": "button",
+      "issue": "No accessible label",
+      "recommendation": "Add an aria-label or text content."
+    }
+  ],
+  "summary": "Assistant analyzed accessibility successfully."
+}
+```
+
+---
+
+#### Analyze HTML Content (Chat)
+**POST** `/api/accessibility/htmlWithChat`
+
+**Request Body**:
+```json
+{
+  "html": "<html>...</html>",
+  "getImageDescriptions": true
+}
+```
+
+#**Response**:
+```json
+{
+  "issues": [
+    {
+      "element": "img",
+      "issue": "Missing alt attribute",
+      "recommendation": "Provide an alt attribute for better accessibility."
+    }
+  ]
+}
+```
+
+---
+
+#### Analyze PDF (Chat)
+**POST** `/api/accessibility/pdfWithChat`
+
+**Request Body**: FormData
+
+- **file**: PDF file to upload.
+
+**Response**:
+```json
+{
+  "issues": [
+    {
+      "page": 1,
+      "issue": "No document title",
+      "recommendation": "Add a title to improve PDF accessibility."
+    }
+  ]
+}
+```
 
 ---
 
@@ -167,9 +276,9 @@ frontend/web-accessibility-app/
 
 Automate the deployment to Azure Static Web Apps using GitHub Actions.
 
-1. **Create a Workflow File**: `.github/workflows/frontend-deploy.yml`
+### 1. Create a Workflow File
 
-2. **Sample Workflow**:
+Place the following file in `.github/workflows/frontend-deploy.yml`:
 
 ```yaml
 name: Deploy Frontend
@@ -192,30 +301,14 @@ jobs:
         run: npm run build
       - name: Deploy to Azure
         run: |
-          az staticwebapp upload --name web-accessibility-app \
-                                --resource-group website-accessibility \
-                                --source ./frontend/web-accessibility-app/build
+          az staticwebapp upload --name inclusivai-frontend \
+                                --resource-group inclusivai-resources \
+                                --source ./build
 ```
 
-3. **Secrets Configuration**:
-   - Add Azure credentials to your repository's secrets under the name `AZURE_CREDENTIALS`.
+### 2. Secrets Configuration
 
----
-
-## Testing
-
-### Run Tests
-
-```bash
-npm test
-```
-
-### Testing Tools
-
-- **Jest**:
-  - Unit testing framework for JavaScript and TypeScript.
-- **React Testing Library**:
-  - Used for component testing.
+Add Azure credentials to your repository's secrets under the name `AZURE_CREDENTIALS`.
 
 ---
 
@@ -224,7 +317,3 @@ npm test
 - **Fermin Piccolo**
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
-
----
-
-> ⚠ **Disclaimer**: This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage.
