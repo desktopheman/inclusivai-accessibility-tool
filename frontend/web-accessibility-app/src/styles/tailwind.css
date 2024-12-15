@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Global Styles */
+/* Global Styles */
 body {
   @apply bg-gray-50 font-sans text-gray-800;
 }
@@ -11,20 +11,28 @@ body {
   @apply max-w-4xl mx-auto p-6 rounded-md bg-white shadow-md;
 }
 
-.loading-text {
-  @apply text-center mt-4 text-blue-600 font-semibold;
-}
-
 .input-field {
   @apply w-full p-3 border rounded-md shadow-sm border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none;
 }
 
 .btn-primary {
-  @apply flex-1 py-3 px-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-md;
+  @apply flex-1 py-3 px-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none;
 }
 
 .btn-secondary {
-  @apply flex-1 py-3 px-6 text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-md;
+  @apply flex-1 py-3 px-6 text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-md focus:ring-2 focus:ring-green-500 focus:outline-none;
+}
+
+.tabs {
+  @apply flex justify-center mb-6;
+}
+
+.tab-button {
+  @apply py-2 px-4 border-b-2 font-medium text-gray-600 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none;
+}
+
+.tab-button.active {
+  @apply text-blue-600 border-blue-600;
 }
 
 .result-container {
@@ -40,7 +48,7 @@ body {
 }
 
 .issue-card {
-  @apply p-4 border rounded-md shadow-sm bg-white hover:shadow-lg transition;
+  @apply p-4 border-l-4 rounded-md shadow-sm bg-white hover:shadow-lg transition;
 }
 
 .issue-title {
@@ -51,21 +59,13 @@ body {
   @apply text-center text-green-600 font-bold mt-6;
 }
 
+/* Spinner Animation */
 .spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  margin-top: 2rem;
+  @apply flex justify-center items-center mt-8;
 }
 
 .spinner {
-  border: 4px solid #e5e7eb; /* light gray */
-  border-top: 4px solid #3b82f6; /* blue */
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
+  @apply border-4 border-gray-200 border-t-blue-500 rounded-full w-10 h-10 animate-spin;
 }
 
 @keyframes spin {
@@ -75,4 +75,45 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Severity Classes */
+.bg-yellow-100 {
+  background-color: #fefcbf; /* Low severity background */
+}
+.border-yellow-400 {
+  border-color: #ecc94b; /* Low severity border */
+}
+.text-yellow-800 {
+  color: #744210; /* Low severity text */
+}
+
+.bg-orange-100 {
+  background-color: #fef3c7; /* Medium severity background */
+}
+.border-orange-400 {
+  border-color: #fb923c; /* Medium severity border */
+}
+.text-orange-800 {
+  color: #9a3412; /* Medium severity text */
+}
+
+.bg-red-100 {
+  background-color: #fee2e2; /* High severity background */
+}
+.border-red-400 {
+  border-color: #f87171; /* High severity border */
+}
+.text-red-800 {
+  color: #7f1d1d; /* High severity text */
+}
+
+.bg-blue-100 {
+  background-color: #dbf4ff; /* Improvement background */
+}
+.border-blue-400 {
+  border-color: #60a5fa; /* Improvement border */
+}
+.text-blue-800 {
+  color: #1e40af; /* Improvement text */
 }
