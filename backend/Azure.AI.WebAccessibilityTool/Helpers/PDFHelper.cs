@@ -35,10 +35,6 @@ namespace AzureAI.WebAccessibilityTool.Helpers
                 pdfStructure["ModificationDate"] = document.Information.ModifiedDate ?? "";
                 pdfStructure["Producer"] = document.Information.Producer ?? "";
 
-                // Extract Catalog and CrossReferenceTable
-                //pdfStructure["CatalogDictionary"] = ExtractCatalogDictionary(document);
-                //pdfStructure["CrossReferenceTable"] = ExtractCrossReferenceTable(document);
-
                 // Extract content for each page
                 foreach (var page in document.GetPages())
                 {
