@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { AnalysisResult } from "./types/Accessibility";
 import "./styles/tailwind.css";
 
@@ -14,6 +14,9 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState("url");
   const [result, setResult] = useState<AnalysisResult>();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Ref for the results section
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   /**
    * Function to handle analysis of different input types.
@@ -50,6 +53,11 @@ const App: React.FC = () => {
       });
 
       setResult(response.data);
+
+      // Scroll to the results section after the result is set
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (error) {
       console.error("Failed to analyze content:", error);
     } finally {
@@ -66,40 +74,32 @@ const App: React.FC = () => {
     >
       {/* Header Section */}
       <header className="text-center mb-6">
-        {/* 
-          Updated alt text for clarity and accessibility.
-          Helps screen readers describe the purpose of the logo image.
-        */}
         <motion.img
-          src="/images/logo.png"
-          alt="InclusivAI - Web Accessibility Analysis Tool Logo"
+          src="/images/inclusivAI_header.jpg"
+          alt="InclusivAI - AI-Powered Accessibility Checker for HTML and PDF header image"
           className="mx-auto"
-          width={200}
+          width={500}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         />
-        <h1 className="text-3xl font-bold text-gray-800 mt-4">
-          Accessibility Analyzer
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Advanced AI-powered accessibility verification tool for websites, HTML
-          content, and PDF documents
-        </p>
+        <h1 className="text-3xl font-bold text-gray-800 mt-4">InclusivAI</h1>
+        <h2 className="text-2xl font-bold text-gray-800 mt-4">
+          AI-Powered Accessibility Checker for HTML and PDF
+        </h2>
+        <h3 className="text-1xl font-bold text-gray-600 mt-3">
+          Empowering Accessibility, One Website and Document at a Time
+        </h3>
       </header>
 
       {/* Tabs Section */}
-      <div
-        className="tabs"
-        role="tablist"
-        aria-label="Input Type Tabs" /* Improves accessibility for screen readers */
-      >
+      <div className="tabs" role="tablist" aria-label="Input Type Tabs">
         {["url", "html", "pdf"].map((tab) => (
           <button
             key={tab}
-            role="tab" /* Adds proper semantic role for accessibility */
+            role="tab"
             aria-selected={activeTab === tab}
-            aria-controls={`${tab}-panel`} /* Links to the panel content */
+            aria-controls={`${tab}-panel`}
             className={`tab-button ${activeTab === tab ? "active" : ""}`}
             onClick={() => setActiveTab(tab)}
           >
@@ -110,10 +110,14 @@ const App: React.FC = () => {
 
       {/* Dynamic Content Section */}
       <main role="tabpanel" id={`${activeTab}-panel`}>
-        {/* Input Form */}
         <InputForm activeTab={activeTab} handleAnalyze={handleAnalyze} />
-        {/* Loading Spinner or Results */}
-        {isLoading ? <Spinner /> : <Results result={result} />}
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <div ref={resultsRef}>
+            <Results result={result} />
+          </div>
+        )}
       </main>
     </motion.div>
   );
