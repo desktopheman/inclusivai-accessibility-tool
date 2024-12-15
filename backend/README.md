@@ -4,6 +4,10 @@ This repository contains the backend API for InclusivAI, a tool designed to veri
 
 ---
 
+> ⚠ **Disclaimer**: This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage to avoid unexpected charges.
+
+---
+
 ## Table of Contents
 
 1. [Features](#features)
@@ -253,3 +257,10 @@ jobs:
 - **Fermin Piccolo**
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
+
+
+---
+
+> ⚠ **Disclaimer**: This project uses Azure services, which may incur costs. Be sure to review Azure's pricing and monitor your resource usage to avoid unexpected charges.
+
+---
