@@ -260,6 +260,7 @@ public class AccessibilityAnalyzer
 
                 case AnalysisType.PDF:
                 case AnalysisType.WordDocument:
+                    resourceFileName = "Prompt_PDF.txt";
                     if (input.ExtractFileContent)
                         if (input.FileContent == null || input.FileContent.Length == 0)
                             throw new ArgumentException("File content cannot be empty.", nameof(input.FileContent));
@@ -282,6 +283,15 @@ public class AccessibilityAnalyzer
 
             if (input.Type == AnalysisType.PDF || input.Type == AnalysisType.WordDocument)
             {
+                if (useAssistant)
+                {
+                    return (contentToAnalyze, "");
+                }
+                else
+                {
+                    string basePrompt = ResourceHelper.GetResourceContent(resourceFileName);
+                    return (basePrompt.Replace("#CONTENT", contentToAnalyze), "");
+                }
                 return (contentToAnalyze, "");
             }
             else

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Prompt_PDF.txt" />
     <EmbeddedResource Include="Resources\Prompt_HTML.txt" />
   </ItemGroup>
 
