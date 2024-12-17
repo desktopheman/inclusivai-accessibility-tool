@@ -39,5 +39,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEBAPP_TOKEN }}
           app_location: "frontend/web-accessibility-app" # App path
-          output_location: "build"                        
-          skip_app_build: true                            
+          output_location: "build"                                  
