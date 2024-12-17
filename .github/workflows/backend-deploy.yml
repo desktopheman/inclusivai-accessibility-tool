@@ -20,10 +20,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Build
-      run: dotnet build ./backend/AzureAI.WebAccessibilityTool.API/AzureAI.WebAccessibilityTool.API.csproj --configuration Release
-
+      run: dotnet build ./backend/Azure.AI.WebAccessibilityTool.API/AzureAI.WebAccessibilityTool.API.csproj --configuration Release
+      
     - name: Publish
-      run: dotnet publish ./backend/AzureAI.WebAccessibilityTool.API/AzureAI.WebAccessibilityTool.API.csproj -c Release -o ./publish
+      run: dotnet publish ./backend/Azure.AI.WebAccessibilityTool.API/AzureAI.WebAccessibilityTool.API.csproj -c Release -o ./publish      
 
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
