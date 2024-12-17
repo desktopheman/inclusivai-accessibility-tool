@@ -11,19 +11,21 @@ jobs:
       # Checkout do código
       - uses: actions/checkout@v3
 
-      # Instalação do Node.js
+      # Instalação do Node.js (Node 18)
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
 
-      # Instalação das dependências
+      # Instalação das dependências no diretório correto
       - name: Install dependencies
         run: npm install
+        working-directory: frontend/web-accessibility-app
 
-      # Build do projeto
+      # Build do projeto no diretório correto
       - name: Build
         run: npm run build
+        working-directory: frontend/web-accessibility-app
 
       # Login no Azure
       - name: Azure Login
@@ -36,7 +38,6 @@ jobs:
         uses: azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEBAPP_TOKEN }}
-          app_location: "frontend"             
-          output_location: "build"             
-          resource_group: website-accessibility
-          skip_app_build: true                 
+          app_location: "frontend/web-accessibility-app"   
+          output_location: "build"                        
+          skip_app_build: true                            
