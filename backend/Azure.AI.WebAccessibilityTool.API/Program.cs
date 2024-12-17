@@ -17,9 +17,9 @@ public class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Web Accessibility Tool API",
+                Title = "InclusivAI: Accessibility Verification Tool",
                 Version = "v1",
-                Description = "API for analyzing website accessibility using Azure AI services.",
+                Description = "InclusivAI is a powerful tool designed to verify and improve accessibility for specific URLs, HTML, and PDF files. Leveraging Azure AI services, InclusivAI ensures compliance with major accessibility standards",
                 Contact = new OpenApiContact
                 {
                     Name = "Fermin Piccolo",
@@ -46,16 +46,16 @@ public class Program
 
         app.UseCors("AllowReactApp");
 
-        if (app.Environment.IsDevelopment())
+        //if (app.Environment.IsDevelopment())
+        //{
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web Accessibility Tool API v1");
-                c.RoutePrefix = string.Empty;
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web Accessibility Tool API v1");
+            c.RoutePrefix = string.Empty;
+        });
+        //}
 
         app.UseRouting();
         app.MapControllers();
