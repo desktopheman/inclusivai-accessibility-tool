@@ -22,10 +22,14 @@ jobs:
         run: npm install
         working-directory: frontend/web-accessibility-app
 
-      # Build do projeto no diretório correto
+      # Build do projeto com variáveis de ambiente
       - name: Build
-        run: npm run build
+        run: |
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+          npm run build
         working-directory: frontend/web-accessibility-app
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
       # Login no Azure
       - name: Azure Login
@@ -40,4 +44,4 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEBAPP_TOKEN }}
           app_location: "frontend/web-accessibility-app" 
           output_location: "build"                      
-          deployment_action: "upload"                            
+          deployment_action: "upload"
