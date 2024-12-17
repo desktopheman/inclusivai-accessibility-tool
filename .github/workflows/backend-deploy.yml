@@ -8,14 +8,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
+
     - name: Build
-      run: dotnet build ./backend/WebAccessibility.Api/WebAccessibility.Api.csproj
-    - name: Deploy to Azure
-      run: |
-        az webapp deploy --resource-group website-accessibility \
-                        --name web-accessibility-api \
-                        --src-path ./backend/WebAccessibility.Api/bin/Release/net8.0/publish
+      run: dotnet build ./backend/WebAccessibility.Api/WebAccessibility.Api.csproj --configuration Release
+
+    - name: Publish
+      run: dotnet publish ./backend/WebAccessibility.Api/WebAccessibility.Api.csproj -c Release -o ./publish
+
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'web-accessibility-api'
+        package: ./publish

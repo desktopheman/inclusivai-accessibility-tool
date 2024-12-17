@@ -3,21 +3,40 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    - name: Install dependencies
-      run: npm install
-    - name: Build
-      run: npm run build
-    - name: Deploy to Azure
-      run: |
-        az staticwebapp upload --name web-accessibility-app \
-                              --resource-group website-accessibility \
-                              --source ./frontend/build
+      # Checkout do código
+      - uses: actions/checkout@v3
+
+      # Instalação do Node.js
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Instalação das dependências
+      - name: Install dependencies
+        run: npm install
+
+      # Build do projeto
+      - name: Build
+        run: npm run build
+
+      # Login no Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Deploy para Static Web App
+      - name: Deploy to Azure Static Web App
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEBAPP_TOKEN }}
+          app_location: "frontend"             
+          output_location: "build"             
+          resource_group: website-accessibility
+          skip_app_build: true                 
