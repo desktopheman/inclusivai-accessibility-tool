@@ -38,5 +38,7 @@ jobs:
         uses: azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEBAPP_TOKEN }}
-          app_location: "frontend/web-accessibility-app" # App path
-          output_location: "build"                                  
+          app_location: "frontend/web-accessibility-app" 
+          output_location: "build"                      
+          deployment_action: "upload"                  
+          skip_app_build: true                      
