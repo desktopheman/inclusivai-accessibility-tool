@@ -21,7 +21,10 @@ public static class FileHelper
     {
         var inspector = new ContentInspectorBuilder()
         {
-            Definitions = MimeDetective.Definitions.Default.All()
+            Definitions = new MimeDetective.Definitions.ExhaustiveBuilder()
+            {
+                UsageType = MimeDetective.Definitions.Licensing.UsageType.PersonalNonCommercial
+            }.Build()
         }.Build();
 
         var results = inspector.Inspect(fileContent);
