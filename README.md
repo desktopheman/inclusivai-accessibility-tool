@@ -1,4 +1,8 @@
-# InclusivAI: Accessibility Verification Tool
+# InclusivAI: Accessibility Checker Tool
+
+<div style="text-align: center;">
+  <img src="images/logo.png" alt="InclusivAI logo">
+</div>
 
 InclusivAI is a powerful tool designed to verify and improve accessibility for specific URLs, HTML, and PDF files. Leveraging Azure AI services, InclusivAI ensures compliance with major accessibility standards, including:
 

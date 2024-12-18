@@ -60,14 +60,14 @@ const Results: React.FC<ResultsProps> = ({ result }) => {
     >
       {/* Header for Analysis Results */}
       <h2 id="resultsTitle" className="result-title">
-        Analysis Results
+        <p className="text-center font-bold mb-4 text-black">Analysis Result</p>
       </h2>
       {/* Descriptive explanation of results */}
-      <p className="result-explanation" aria-describedby="resultsTitle">
+      <p className="result-explanation mb-6" aria-describedby="resultsTitle">
         {result.explanation}
       </p>
       <ul
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2"
         aria-labelledby="resultsTitle"
         role="list" /* Semantic list role for screen readers */
       >
@@ -76,34 +76,36 @@ const Results: React.FC<ResultsProps> = ({ result }) => {
             key={index}
             className={`issue-card border-l-4 ${getSeverityClass(
               item.severity
-            )}`}
+            )} p-4`}
             whileHover={{ scale: 1.02 }}
             role="listitem" /* Improves semantic structure */
             aria-label={`Issue ${index + 1}: ${item.issue}, Severity: ${item.severity}`} /* Descriptive label */
           >
             {/* Individual Issue Card */}
-            <h3 className="issue-title">Issue #{index + 1}</h3>
-            <p>
+            <h3 className="issue-title mb-2 font-semibold">
+              Issue #{index + 1}
+            </h3>
+            <p className="mb-2">
               <strong>Element:</strong> {item.element}
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Description:</strong> {item.issue}
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Severity:</strong> {item.severity}
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Recommendation:</strong> {item.recommendation}
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Source:</strong> {item.source}
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Details:</strong> {item.details}
             </p>
             {/* Optional Image Description Recommendation */}
             {item.imageDescriptionRecommendation && (
-              <p>
+              <p className="mb-2">
                 <strong>Image description recommendation:</strong>{" "}
                 {item.imageDescriptionRecommendation}
               </p>

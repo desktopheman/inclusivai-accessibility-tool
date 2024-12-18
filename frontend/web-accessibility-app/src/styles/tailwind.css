@@ -2,118 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
-body {
-  @apply bg-gray-50 font-sans text-gray-800;
+/* Custom Color Overrides */
+@layer utilities {
+  .bg-custom-red {
+    background-color: #FF3131;
+  }
+  .bg-custom-red-hover {
+    background-color: #eb0000;
+  }
+  .border-custom-red {
+    border-color: #FF3131;
+  }
+  .text-custom-red {
+    color: #FF3131;
+  }
+  .hover\:bg-custom-red:hover {
+    background-color: #FF3131;
+  }
+  .focus\:ring-custom-red:focus {
+    box-shadow: 0 0 0 2px #FF3131;
+  }
 }
 
-.App {
-  @apply max-w-4xl mx-auto p-6 rounded-md bg-white shadow-md;
+/* Global */
+.app-wrapper {
+  @apply bg-gray-100 flex justify-center items-center min-h-screen overflow-y-auto px-10 py-2;
 }
 
-.input-field {
-  @apply w-full p-3 border rounded-md shadow-sm border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+.app-container {
+  @apply flex flex-col w-full max-w-md mx-auto border border-custom-red bg-white h-full;
 }
 
-.btn-primary {
-  @apply flex-1 py-3 px-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none;
+.header {
+  @apply text-white h-[420px] py-8 text-center w-full bg-custom-red;
 }
 
-.btn-secondary {
-  @apply flex-1 py-3 px-6 text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-md focus:ring-2 focus:ring-green-500 focus:outline-none;
+.logo {
+  @apply mx-auto;
 }
 
-.tabs {
-  @apply flex justify-center mb-6;
+.header-title {
+  @apply text-3xl font-bold uppercase;
 }
 
-.tab-button {
-  @apply py-2 px-4 border-b-2 font-medium text-gray-600 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none;
+.header-description {
+  @apply mt-2 text-lg font-bold uppercase;
 }
 
-.tab-button.active {
-  @apply text-blue-600 border-blue-600;
+.header-details {
+  @apply mt-2 text-sm px-4;
 }
 
-.result-container {
-  @apply mt-8 bg-white p-6 rounded-md shadow-md;
+.content-container {
+  @apply flex-1 w-full flex flex-col items-center bg-white rounded-t-[3rem] -mt-8 shadow-lg p-6 w-full max-w-lg mx-auto;
 }
 
-.result-title {
-  @apply text-2xl font-bold text-gray-800 text-center mb-4;
+.form-container {
+  @apply bg-white rounded-md mt-4 w-full flex flex-col;
 }
 
-.result-explanation {
-  @apply text-center text-gray-600 mb-6;
+.selected-button {
+  @apply text-white font-bold py-2 px-10 rounded-md w-[120px] h-[50px] bg-custom-red;
 }
 
-.issue-card {
-  @apply p-4 border-l-4 rounded-md shadow-sm bg-white hover:shadow-lg transition;
+.non-selected-button {
+  @apply border border-gray-300 text-gray-600 font-bold py-2 px-2 rounded-md hover:border-custom-red hover:text-custom-red;
 }
 
-.issue-title {
-  @apply text-lg font-semibold text-blue-600 mb-2;
+.input-field,
+.textarea-field,
+.file-input {
+  @apply border p-3 rounded-md w-full focus:outline-none focus:ring-2 border-custom-red;
+}
+.input-field:focus,
+.textarea-field:focus,
+.file-input:focus {
+  box-shadow: 0 0 0 2px #FF3131;
 }
 
-.no-issues {
-  @apply text-center text-green-600 font-bold mt-6;
+.btn {
+  @apply text-white font-bold py-2 px-10 rounded-md shadow-md uppercase w-[165px] h-[55px];
 }
 
-/* Spinner Animation */
-.spinner-container {
-  @apply flex justify-center items-center mt-8;
+.btn-red {
+  @apply bg-custom-red hover:bg-custom-red-hover;
+}
+
+.btn-gray {
+  @apply bg-gray-400 hover:bg-gray-500;
+}
+
+.results-container {
+  @apply mt-4 bg-gray-50 p-6 rounded-md w-full;
+}
+
+.spinner-overlay {
+  @apply fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center;
 }
 
 .spinner {
-  @apply border-4 border-gray-200 border-t-blue-500 rounded-full w-10 h-10 animate-spin;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Severity Classes */
-.bg-yellow-100 {
-  background-color: #fefcbf; /* Low severity background */
-}
-.border-yellow-400 {
-  border-color: #ecc94b; /* Low severity border */
-}
-.text-yellow-800 {
-  color: #744210; /* Low severity text */
-}
-
-.bg-orange-100 {
-  background-color: #fef3c7; /* Medium severity background */
-}
-.border-orange-400 {
-  border-color: #fb923c; /* Medium severity border */
-}
-.text-orange-800 {
-  color: #9a3412; /* Medium severity text */
-}
-
-.bg-red-100 {
-  background-color: #fee2e2; /* High severity background */
-}
-.border-red-400 {
-  border-color: #f87171; /* High severity border */
-}
-.text-red-800 {
-  color: #7f1d1d; /* High severity text */
-}
-
-.bg-blue-100 {
-  background-color: #dbf4ff; /* Improvement background */
-}
-.border-blue-400 {
-  border-color: #60a5fa; /* Improvement border */
-}
-.text-blue-800 {
-  color: #1e40af; /* Improvement text */
+  @apply w-16 h-16 border-4 border-gray-200 rounded-full animate-spin;
+  border-top-color: #FF3131;
 }
