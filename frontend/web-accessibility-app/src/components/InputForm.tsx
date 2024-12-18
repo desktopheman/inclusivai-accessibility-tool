@@ -88,7 +88,11 @@ const InputForm: React.FC<InputFormProps> = ({
         <button
           className="btn btn-red"
           onClick={() =>
-            handleAnalyze(url || htmlContent || pdfFile!, activeInput, false)
+            handleAnalyze(
+              url || htmlContent || (pdfFile ?? new File([], "")),
+              activeInput,
+              false
+            )
           }
         >
           CHAT
@@ -96,7 +100,11 @@ const InputForm: React.FC<InputFormProps> = ({
         <button
           className="btn btn-gray"
           onClick={() =>
-            handleAnalyze(url || htmlContent || pdfFile!, activeInput, true)
+            handleAnalyze(
+              url || htmlContent || (pdfFile ?? new File([], "")),
+              activeInput,
+              true
+            )
           }
         >
           ASSISTANT
