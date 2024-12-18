@@ -4,9 +4,12 @@
   <img src="images/inclusivai_screenshot01.png" alt="InclusivAI Screenshot 1" height="300">
   <img src="images/inclusivai_screenshot02.png" alt="InclusivAI Screenshot 2" height="300">
   <img src="images/inclusivai_screenshot04.png" alt="InclusivAI Screenshot 4" height="284" align="top">
+</p>
+<p align="center">
   <img src="images/inclusivai_screenshot03.png" alt="InclusivAI Screenshot 3" height="300">  
   <img src="images/inclusivai_screenshot05.png" alt="InclusivAI Screenshot 5" height="284" align="top">
 </p>
+
 
 InclusivAI is a powerful tool designed to verify and improve accessibility for specific URLs, HTML, and PDF files. Leveraging Azure AI services, InclusivAI ensures compliance with major accessibility standards, including:
 
