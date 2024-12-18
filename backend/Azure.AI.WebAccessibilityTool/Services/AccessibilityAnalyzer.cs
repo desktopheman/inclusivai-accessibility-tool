@@ -10,7 +10,7 @@ using System.Text.Json;
 using System.Text;
 using AzureAI.WebAccessibilityTool.Helpers;
 using SkiaSharp;
-using System.Linq.Expressions;
+using Svg.Skia;
 
 namespace AzureAI.WebAccessibilityTool.Services;
 
@@ -93,12 +93,36 @@ public class AccessibilityAnalyzer
             if (response.Content.Headers.ContentLength > 6 * 1024 * 1024)
                 throw new Exception("The image is too large.");
 
+            // Dimensions limit            
             using var imageStream = await response.Content.ReadAsStreamAsync();
-            using var skBitmap = SKBitmap.Decode(imageStream);
+            if (response.Content.Headers.ContentType?.MediaType == "image/svg+xml")
+            {                
+                var svg = new SKSvg();
+                svg.Load(imageStream);
+                            
+                var width = (int)(svg.Picture?.CullRect.Width ?? throw new InvalidOperationException("SVG picture is null."));
+                var height = (int)(svg.Picture?.CullRect.Height ?? throw new InvalidOperationException("SVG picture is null."));
+                
+                if (width < 50 || height < 50 || width > 10240 || height > 10240)
+                    throw new Exception("The image dimensions are out of the limits (50x50 to 10240x10240 pixels).");
+                
+                var skBitmap = new SKBitmap(width, height);
+                using (var canvas = new SKCanvas(skBitmap))
+                {
+                    canvas.Clear(SKColors.Transparent);
+                    canvas.DrawPicture(svg.Picture);
+                }
+            }
+            else
+            {
+                using var skBitmap = SKBitmap.Decode(imageStream);
+                
+                if (skBitmap == null)
+                    throw new Exception("Unsupported image format.");
 
-            // Dimensions limits
-            if (skBitmap.Width < 50 || skBitmap.Height < 50 || skBitmap.Width > 10240 || skBitmap.Height > 10240)
-                throw new Exception("The image dimensions are out of the limits (50x50 to 10240x10240 pixels).");
+                if (skBitmap.Width < 50 || skBitmap.Height < 50 || skBitmap.Width > 10240 || skBitmap.Height > 10240)
+                    throw new Exception("The image dimensions are out of the limits (50x50 to 10240x10240 pixels).");
+            }
 
             ImageAnalysisResult analysis = await imageAnalysisClient.AnalyzeAsync(new Uri(imageUrl),
                                                                                   VisualFeatures.DenseCaptions,
@@ -291,8 +315,7 @@ public class AccessibilityAnalyzer
                 {
                     string basePrompt = ResourceHelper.GetResourceContent(resourceFileName);
                     return (basePrompt.Replace("#CONTENT", contentToAnalyze), "");
-                }
-                return (contentToAnalyze, "");
+                }                
             }
             else
             {
