@@ -104,14 +104,7 @@ public class AccessibilityAnalyzer
                 var height = (int)(svg.Picture?.CullRect.Height ?? throw new InvalidOperationException("SVG picture is null."));
                 
                 if (width < 50 || height < 50 || width > 10240 || height > 10240)
-                    throw new Exception("The image dimensions are out of the limits (50x50 to 10240x10240 pixels).");
-                
-                var skBitmap = new SKBitmap(width, height);
-                using (var canvas = new SKCanvas(skBitmap))
-                {
-                    canvas.Clear(SKColors.Transparent);
-                    canvas.DrawPicture(svg.Picture);
-                }
+                    throw new Exception("The image dimensions are out of the limits (50x50 to 10240x10240 pixels).");                
             }
             else
             {

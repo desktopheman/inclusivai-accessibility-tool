@@ -16,7 +16,8 @@ const App: React.FC = () => {
   const handleAnalyze = async (
     input: string | File,
     type: string,
-    useAssistant: boolean
+    useAssistant: boolean,
+    imageDescriptions: boolean
   ) => {
     setIsLoading(true);
     try {
@@ -28,7 +29,10 @@ const App: React.FC = () => {
         formData.append("file", input as File);
         payload = formData;
       } else {
-        payload = type === "url" ? { Url: input } : { Html: input };
+        payload =
+          type === "url"
+            ? { url: input, getImageDescriptions: imageDescriptions }
+            : { html: input, getImageDescriptions: imageDescriptions };
       }
 
       const response = await api.post(endpoint, payload, {

@@ -6,7 +6,8 @@ interface InputFormProps {
   handleAnalyze: (
     input: string | File,
     type: string,
-    useAssistant: boolean
+    useAssistant: boolean,
+    imageDescriptions: boolean
   ) => void;
 }
 
@@ -18,6 +19,7 @@ const InputForm: React.FC<InputFormProps> = ({
   const [url, setUrl] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [imageDescriptions, setImageDescriptions] = useState(false);
 
   const renderInputField = () => {
     if (activeInput === "url") {
@@ -78,6 +80,18 @@ const InputForm: React.FC<InputFormProps> = ({
             {item.toUpperCase()}
           </button>
         ))}
+
+        <div className="flex items-center justify-start p-2">
+          <input
+            type="checkbox"
+            id="getImageDescriptions"
+            className="mr-2 transform scale-150"
+            onChange={(e) => setImageDescriptions(e.target.checked)}
+          />
+          <label htmlFor="getImageDescriptions" className="text-black">
+            Alt suggestions
+          </label>
+        </div>
       </div>
 
       <p className="text-center font-bold mb-2 text-black pt-8 pb-4">
@@ -91,7 +105,8 @@ const InputForm: React.FC<InputFormProps> = ({
             handleAnalyze(
               url || htmlContent || (pdfFile ?? new File([], "")),
               activeInput,
-              false
+              false,
+              imageDescriptions
             )
           }
         >
@@ -103,7 +118,8 @@ const InputForm: React.FC<InputFormProps> = ({
             handleAnalyze(
               url || htmlContent || (pdfFile ?? new File([], "")),
               activeInput,
-              true
+              true,
+              imageDescriptions
             )
           }
         >
