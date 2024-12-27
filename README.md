@@ -282,6 +282,8 @@ jobs:
   - [GitHub](https://github.com/frmpiccolo)
   - [LinkedIn](https://www.linkedin.com/in/ferminpiccolo/)
 
+- **Jasmine Taylor**  
+  - [LinkedIn](https://www.linkedin.com/in/jasmine-taylor-449384222/)
 
 ---
 
